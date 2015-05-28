@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <!-- Ensure that everything scales appropriately on a mobile device -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div id="gameArea">
+        <!-- This is where the templates defined below will be used -->
+    </div>
+
+    <!-- Main Title Screen that appears when the page loads for the first time -->
+    <script id="intro-screen-template" type="text/template">
+        <div class="titleWrapper">
+            <div class="title">
+                world wide gaming
+            </div>
+            <div class="buttons">
+                <button id="btnCreateGame" class="btn left">CREATE</button>
+                <button id="btnJoinGameController" class="btn right">JOIN AS CONTROLLER</button>
+                <button id="btnJoinGameBrowser" class="btn middle">JOIN AS BROWSER</button>
+                <div style="clear:both"></div>
+            </div>
+        </div>
+    </script>
+    <!-- This screen appears when a user clicks "CREATE" on the Title Screen -->
+    <script id="create-game-template" type="text/template">
+        <div class="createGameWrapper">
+            <div class="info">Open this site on your mobile device:</div>
+            <div id="gameURL" class="infoBig">Error!</div>
+            <div class="info">Then click <strong>JOIN</strong> and <br/> enter the following Game ID:</div>
+            <div id="spanNewGameCode" class="gameId">Error!</div>
+            <div id="playersWaiting"></div>
+        </div>
+    </script>
+    <!-- This scrreen appears when a player clicks "JOIN AS CONTROLLER" on the Title Screen -->
+    <script id="join-game-template" type="text/template">
+        <div class="joinGameWrapper">
+            <div class="info">
+            <p>You are trying to join as a controller.</p>
+                <label for="inputPlayerName">Your Name:</label>
+                <input id="inputPlayerName" type="text" />
+            </div>
+            <div class="info">
+                <label for="inputGameId">Game ID:</label>
+                <input id="inputGameId" type="tel"/>
+            </div>
+            <div class="info buttons">
+                <button id="btnStart" class="btn">Start</button>
+                <div id="playerWaitingMessage"></div>
+            </div>
+        </div>
+    </script>
+       <!-- This scrreen appears when a player clicks "JOIN AS BROWSER" on the Title Screen -->
+    <script id="join-game-as-browser-template" type="text/template">
+        <div class="joinGameWrapper">
+            <div class="info">
+              <p>You are trying to join as a browser.</p>
+                <label for="inputGameId">Game ID:</label>
+                <input id="inputGameId" type="tel"/>
+            </div>
+            <div class="info buttons">
+                <button id="btnStartAsBrowser" class="btn">Start</button>
+                <div id="playerWaitingMessage"></div>
+            </div>
+        </div>
+    </script>
+    <!-- This is the 'Host' screen. Cesium goes here! -->
+    <script id="host-game-template" type="text/template">
+        <div class='infos'>
+           <table>
+            <tr>
+              <td><h1 id='target'> </h1></td>
+              <td><h1 id='scoreText'>  - score</h1></td>
+              <td><div id ='score'></div></td>
+            </tr>
+          </table>
+        </div>
+        <div class='staticMap'>
+          <div class='mapToShow'>
+            <img id='staticImg' src='http://dev.virtualearth.net/REST/v1/Imagery/Map/Aerial/46.54, 6.59/15?mapSize=300,200&key=AvRFjXkotEcTdjuZLdPtg2JqWv3yKtMLkBeQnQvQ7nERmEWpdpxqP9itXTf55Yb9'>
+          </div>
+        </div>
+        <div id="cesiumContainer" class="fullSize"></div>
+        <div id="loadingOverlay"><h1>Loading...</h1></div>
+        <div id="toolbar"></div>
+    </script>
+   
+    <!-- This is the 'Player' screen. Mobile HTML goes here! -->
+    <script id="player-game-template" type="text/template">
+      <div id='isConnected'>
+        <div id = 'wrapperPlayer'>
+          <button id='debug'>send debug</button>
+          <div id="containerPlayer">
+            <div class="start" id="step00">
+              <div class ="image">
+                <h1 class="text">start</h1>
+                <img src='textures/star1.png' class="spin">
+              </div>
+            </div>
+            <div class="start" id="step01">
+              <h1 id ='northing'>N</h1>
+              <div class ="image">
+                <h1 class="text">choose orientation</h1>
+                <img src='textures/compass.png' id="compass">
+              </div>
+            </div>
+            <div class="start" id="step02">
+              <div class ="image">
+                <h1 id ='angle'>10</h1>
+                <h1 class="text">choose elevation</h1>
+                <div id="elevationContainer">
+                  <img src='textures/circle.png' id= "elevation">
+                </div>
+              </div>
+            </div>
+            <div class="start" id="step03">
+              <div class ="image">
+                <div class='button' id ='shake'>
+                  <h1>shake</h1>
+                </div>
+                <div class='button' id='sound'>
+                  <h1>shout</h1>
+                </div>
+                <div class='button' id='precision'>
+                  <h1>precision</h1>
+                </div>          
+              </div>
+            </div>
+           <div class="start" id="step04">
+              <div class ="image">
+                <h1 id ='force'>0</h1>
+                <h1 class="text">throw it!</h1>
+                <img src='textures/star1.png' class="spin">
+              </div>
+            </div>
+          </div>
+          <div id='dataContainerOrientation'></div>
+          <div id='dataContainerMotion'></div>
+      </div>
+      <div id='sliderWrapper'>
+        <button id='escapeZoom'>escape zoom!</button>
+        <div class='slider' id='plus'>
+          <h1>+</h1>
+        </div>
+        <div class='slider' id='minus'>
+          <h1>-</h1>
+        </div>
+      </div>
+
+    </div>
+    </script>
+
+    <script src="../../Build/Cesium/Cesium.js"></script>
+    <script src="libs/jquery-2.0.2.min.js"></script>
+    <script src="libs/textFit.min.js"></script>
+    <script src="libs/fastclick.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="mainCesium3.js"></script>
+</body>
+</html>
