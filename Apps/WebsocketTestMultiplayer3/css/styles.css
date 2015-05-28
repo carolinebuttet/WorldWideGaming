@@ -40,7 +40,7 @@
     }
         #myTurn{
       display:none;
-      font.weight:.8em;
+      font-weight:0.8em;
       position:absolute;
       float:both;
       padding:10px;
@@ -242,7 +242,7 @@
         position:absolute;
         background-color: rgba(255, 255, 255, 0.3);
         z-index:2;
-        color: white;8il
+        color: white;
         font-weight: 30px;
         margin:10px;
         padding:10px;

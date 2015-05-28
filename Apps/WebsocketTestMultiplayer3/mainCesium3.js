@@ -906,7 +906,7 @@ var App={
             forceMultiplyFactorVol:1.5,
             forceMultiplyFactorShake:4,
             forceMultiplyFactorTouch:1,
-            getCurveCustom:'',
+            //getCurveCustom:'',
             isNeedingSound:false,
             isGeolocated:false,
             round:'',
@@ -1072,7 +1072,7 @@ var App={
                             var allForcesToUse = Math.round(App.Player.allForces);
                             force.innerHTML =allForcesToUse;
                             if(App.Player.allForces>App.Player.higherForce){App.Player.higherForce=App.Player.allForces};
-                            var distanceInKm= App.Player.getCurveCustom(App.Player.higherForce,App.Player.betaSent,0);
+                            var distanceInKm= getCurveCustom(App.Player.higherForce,App.Player.betaSent,0);
                             console.log('distance in km = ' + distanceInKm);
                             //force.innerHTML = Math.round(distanceInKm) + " km" ;
                         }
@@ -1259,7 +1259,7 @@ var App={
 	                var force = document.getElementById('force');
 	                App.Player.precisionForce+=1*App.Player.forceMultiplyFactorTouch;
 	                console.log('precision Force = ' + App.Player.precisionForce);
-	                var distanceInKm= App.Player.getCurveCustom(App.Player.precisionForce,App.Player.betaSent,0);
+	                var distanceInKm= getCurveCustom(App.Player.precisionForce,App.Player.betaSent,0);
 	                force.innerHTML = Math.round(distanceInKm) + " km" ;
             	}
             },
@@ -1304,7 +1304,7 @@ var App={
                                 App.Player.higherVolume=average;
                             }
                             force.innerHTML = roundedVol;
-                            var distanceInKm= App.Player.getCurveCustom(App.Player.higherVolume,App.Player.betaSent,0);
+                            var distanceInKm= getCurveCustom(App.Player.higherVolume,App.Player.betaSent,0);
                             document.getElementById('step00').style.display = "none";
                             document.getElementById('step01').style.display = "none";
                             document.getElementById('step02').style.display = "none";
