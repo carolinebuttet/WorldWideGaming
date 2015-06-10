@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Mobile Styling Test</title>
+	<link href='http://fonts.googleapis.com/css?family=Roboto:400' rel='stylesheet' type='text/css'>
+	<link href="styleSheetMobile.css" rel="stylesheet" type="text/css">
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+
+</head>
+<body onload='androidInit()'>
+	<div class ='wrapper'>
+		<div id='controllerArea'>
+			<div id='welcomeScreenMobile'>
+				<div id='topBoxMobile'></div>
+				<div class='logoBoxMobile'>
+					<img src="data/logo_basic.png">
+				</div>
+				<div id='bottomBoxMobile'>
+					<div class='buttonMobile' id='welcomeConnectMobile'>
+						<p>connect</p>
+					</div>
+				</div>
+			</div>
+			<div id='connectScreenMobile'>
+				<div class='logoBoxMobile'>
+					<img class='logoImgMobile' src="data/logo_basic.png">
+				</div>
+				<div id='connectBottomBoxMobile'>
+					<div id='connectionButtonsWrapperMobile'>
+						<div class='buttonMobile' id='connectionButtonMobile'>
+							<p>connect</p>
+						</div>
+						<form><input type="text" name="teamName" placeholder="team name"></form>
+						<form><input type="text" name="code" maxlength='5' placeholder="code"></form>
+					</div>
+				</div>
+			</div>
+			<div id='controlsScreenMobile'>
+				<div id='orientationMobile'>
+					<div class='controlTopBoxMobile'>
+						<div class='dataDisplayWrapperMobile'>
+							<div class='dataDisplayMobile'>
+								<h1>15</h1>
+							</div>
+						</div>
+					</div>
+					<div class='logoBoxMobile'>
+						<img src="data/orange_circle.png">
+						<img id ='orientationImg' src="data/orientation.png">
+					</div>
+					<div class='controlTopBoxMobile'>
+						<div class='helpMobile'><p>?</p></div>
+						<div class='infoboxMobile'><p>turn your phone to get the orientation, click to validate</p></div>
+					</div>
+				</div>
+				<div id='azimuthMobile'>
+					<div class='controlTopBoxMobile'>
+						<div class='dataDisplayWrapperMobile'>
+							<div class='dataDisplayMobile'>
+								<h1>15</h1>
+							</div>
+						</div>
+					</div>
+					<div class='logoBoxMobile'>
+						<img src="data/orange_circle.png">
+						<img src="data/elevation_fixed_s.png">
+						<img id='azimuthImg' src="data/elevation_moves_s.png">
+					</div>
+					<div class='controlTopBoxMobile'>
+						<div class='helpMobile'><p>?</p></div>
+						<div class='infoboxMobile'><p>tils your phone to get the azimuth click to validate</p></div>
+					</div>
+				</div>
+				<div id='forceMobile'>
+					<div class='controlTopBoxMobile'>
+						<div class='dataDisplayWrapperMobile'>
+							<div class='dataDisplayMobile'>
+								<h1>150 km</h1>
+							</div>
+						</div>
+					</div>
+					<div class='logoBoxMobile'>
+						<img src="data/orange_circle.png">
+						<img src="data/force.png">
+						<div id='forceImg'></div>
+						<div class='shield' onmouseup="mouseUp()" ontouchstart="touchStart()" onmousedown="mouseDown()" ontouchend="touchEnd()"></div>
+					</div>
+					<div class='controlTopBoxMobile'>
+						<div class='helpMobile'><p>?</p></div>
+						<div class='infoboxMobile'><p>press the circle to increase the force click to validate</p></div>
+					</div>
+				</div>
+				<div id='throwMobile'>
+					<div class='controlTopBoxMobile'>
+						<div class='dataDisplayWrapper'>
+							<div class='dataDisplayMobile'>
+								<h1></h1>
+							</div>
+						</div>
+					</div>
+					<div class='logoBoxMobile'>
+						<img src="data/orange_circle.png">
+						<img src="data/throw.png">
+					</div>
+					<div class='controlTopBoxMobile'>
+						<div class='helpMobile'><p>?</p></div>
+						<div class='infoboxMobile'><p>throw your phone to launch the bullet ! (but hold it) click to validate</p></div>
+					</div>
+				</div>
+				<div id='zoomMobile'>
+					<div class='controlTopBoxMobile'>
+						<div class='dataDisplayWrapperMobile'>
+							<div class='dataDisplayMobile'>
+								<h1></h1>
+							</div>
+						</div>
+					</div>
+					<div class='logoBoxMobile'>
+						<img src="data/orange_circle.png">
+						<img src="data/zoom.png">
+						<div class='shield' id='zoomPlus'></div>
+						<div class='shield' id='zoomMinus'></div>
+					</div>
+					<div class='controlTopBoxMobile'>
+						<div class='helpMobile'><p>?</p></div>
+						<div class='infoboxMobile'><p>zoom in or out to see where the bullet is going!</p></div>
+					</div>
+				</div>
+				<div id='waitMobile'>
+					<div class='controlTopBoxMobile'>
+						<div class='dataDisplayWrapperMobile'>
+							<div class='dataDisplayMobile'>
+								<h1></h1>
+							</div>
+						</div>
+					</div>
+					<div class='logoBoxMobile'>
+						<img src="data/logo_basic.png">
+					</div>
+					<div class='controlTopBoxMobile'>
+						<div class='helpMobile'><p>?</p></div>
+						<div class='infoboxMobile'><p>wait for your turn, you impatient bitch!</p></div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+	function mouseUp(){
+		console.log('mouse up');
+	}
+	function mouseDown(){
+		console.log('mouse down');
+	}
+	function touchStart(){
+		console.log('touch start');
+	}
+	function touchEnd(){
+		console.log('touch end');
+	}
+    //this is a script to prevent the menu from appearing in android
+    function absorbEvent_(event) {
+      var e = event || window.event;
+      e.preventDefault && e.preventDefault();
+      e.stopPropagation && e.stopPropagation();
+      e.cancelBubble = true;
+      e.returnValue = false;
+      return false;
+    }
+
+    function preventLongPressMenu(node) {
+      node.ontouchstart = absorbEvent_;
+      node.ontouchmove = absorbEvent_;
+      node.ontouchend = absorbEvent_;
+      node.ontouchcancel = absorbEvent_;
+    }
+
+    function androidInit() {
+        console.log('init android stuff!!!');
+        //preventLongPressMenu(document.getElementById('theimage'));
+        //document.getElementsByClassName()
+        //preventLongPressMenu(document.getElementById('controlsScreenMobile'));
+        preventLongPressMenu(document.getElementsByClassName('dontTouch'));
+        console.log('DO NOT TOUCH!!!');
+    }
+  </script>
+</body>
+</html>

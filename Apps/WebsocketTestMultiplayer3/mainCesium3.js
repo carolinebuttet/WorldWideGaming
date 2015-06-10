@@ -12,8 +12,10 @@ var IO = {
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom );
             IO.socket.on('browserJoinedRoom',IO.browserJoinedRoom);
+            IO.socket.on('bothBrowsersAreConnected',IO.displayConnectionForMobile);
             IO.socket.on('beginNewGame', IO.beginNewGame );
             IO.socket.on('gameIsOver', IO.gameOver);
+            IO.socket.on('gameIsInterrupted', IO.gameInterrupted);
             IO.socket.on('error', IO.error );
             IO.socket.on('hostGetDataForce',IO.onDataForce);
             IO.socket.on('hostGetDataAngle', IO.onDataAngle);
@@ -25,10 +27,13 @@ var IO = {
             IO.socket.on('hostStopZoomIn',IO.onStopZoomIn);
             IO.socket.on('hostStopZoomOut',IO.onStopZoomOut);
             IO.socket.on('pickedCities',IO.onPickedCities);
+            IO.socket.on('targetAlert',IO.onAlertarget);
             IO.socket.on('playersLocations',IO.onPlayerLocations);
             IO.socket.on('changeTurn',IO.onChangeTurn);
             IO.socket.on('updateScore', IO.onUpdateScore);
-        },
+            IO.socket.on('chooseColorRed', IO.onPlayerColorRed);
+            IO.socket.on('chooseColorBlue',IO.onPlayerColorBlue);
+            },
         onConnected : function() {
             console.log('new connection, socket is');
             console.log(IO.socket);
@@ -41,9 +46,40 @@ var IO = {
             console.log(data);
             App.Host.gameInit(data);
         },
+        displayConnectionForMobile:function(data){
+            console.log('both browsers are connected, we can start.');
+            console.log('display connection code for mobile');
+            console.log(data);
+            if(App.myRole==='Host'){
+                //here we must give a game ID to only one browser!!!!!!
+                //App.gameId = data.gameId; ---> thats why we put it in app.host.gameinit 
+                console.log('game id is ' + App.gameId);
+                console.log('i should display the code here!');
+                //App.$gameArea.html(App.$browsersDisplayCode);
+                document.getElementById('welcomeText').style.display = "none";
+                document.getElementById('waitForConnectionText').style.display = "none";
+                document.getElementById('displayCode').style.display = "block";
+                document.getElementById("codeToDisplay").innerHTML = data.gameId;
+
+            }
+        },
         playerJoinedRoom : function(data) {
             console.log('a player joined!!!');
             App[App.myRole].updateWaitingScreen(data);
+        },
+        onPlayerColorBlue:function(data){
+            if(App.myRole==='Player' && App.mySocketId=== data.mySocketId){
+                console.log('I am blue!');
+                App.Player.isRed=false;
+                App.Player.teamColor='blue';
+            }
+        },
+        onPlayerColorRed:function(data){
+            if(App.myRole==='Player' && App.mySocketId=== data.mySocketId){
+                console.log('I am red!');
+                App.Player.isRed=true;
+                App.Player.teamColor='red';
+            }
         },
         onPlayerLocations : function(data) {
             console.log('got the locations here!!');
@@ -54,7 +90,8 @@ var IO = {
             if(App.Host.playersWithPositions.length===2){
                 console.log('geolocation complete. we can init the cesium with the players positions.');
                 if(App.myRole==='Host'){
-                    console.log('I am a host and I will start cesium');
+                    console.log('I am a host and I will start the game ang cesium');
+                    App.Host.gameStart();
                     console.log(App.Host.playersWithPositions);
                     App.Host.playerLng = App.Host.playersWithPositions[0].playerLng;
                     App.Host.playerLat = App.Host.playersWithPositions[0].playerLat;
@@ -72,9 +109,24 @@ var IO = {
         	if(App.myRole==='Player'&& data.mySocketId ===App.mySocketId){
         		console.log('IT IS MY TURN');
         		document.getElementById('myTurn').style.display = "block";
+                /*console.log('display the right screen...');
+                document.getElementById('waitMobile').style.display = "none";
+                document.getElementById('orientationMobile').style.display = "block";
+                document.getElementById('azimuthMobile').style.display="none";
+                document.getElementById('forceMobile').style.display="none";
+                document.getElementById('throwMobile').style.display="none";
+                document.getElementById('zoomMobile').style.display="none";*/
+                App.Player.clickCount=0;
+                App.Player.customClick();
         	}else if(App.myRole==='Player' && data.mySocketId != App.mySocketId){
         		console.log('ITS NOT MY TURN!!!');
         		document.getElementById('myTurn').style.display = "none";
+                document.getElementById('orientationMobile').style.display="none";
+                document.getElementById('azimuthMobile').style.display="none";
+                document.getElementById('forceMobile').style.display="none";
+                document.getElementById('throwMobile').style.display="none";
+                document.getElementById('zoomMobile').style.display="none";
+                document.getElementById('waitMobile').style.display = "block";
         	}
         },
         onUpdateScore:function(data){
@@ -83,6 +135,10 @@ var IO = {
         		console.log('I should update my socre!');
         		App.Player.updateScore(data);
         	}
+            else if(App.myRole ==='Host'){
+                console.log('I should update the score of player ' + data.mySocketId);
+                App.Host.updateScore(data);
+            }
         },
         browserJoinedRoom : function(data) {
             console.log('a browser joined!!!');
@@ -93,12 +149,24 @@ var IO = {
             }
         },
         beginNewGame : function(data) {
-            App[App.myRole].gameStart();
+            if(App.myRole==='Player'){
+                App[App.myRole].gameStart();
+                //we dont do the game start for host because we don't have the geolocation yet.
+            }
             App[App.myRole].customInit();
+        },
+        onAlertarget:function(data){
+            console.log('target has changed, tell the player!');
+            if(App.myRole==='Player'){
+                App.Player.alertTarget(data);
+            }
         },
         gameOver : function(data) {
             App[App.myRole].endGame(data);
-
+        },
+        gameInterrupted:function(){
+            console.log('game has been interrupted.');
+            alert('Game has been interrupted because someone disconnected.');
         },
         error : function(data) {
             alert(data.message);
@@ -137,6 +205,8 @@ var IO = {
             if(App.myRole==='Host' && data.mySocketId === App.whosPlayerTurn){
                 console.log('I listen to you');
                 App.Host.throwGo=true;
+                //update number of bullets here!
+                App.Host.updateNumberOfBulletsAvailable(data);
             }else{
             }
         },
@@ -170,7 +240,7 @@ var IO = {
         },
         onBallHasArrived:function(data){
             if(App.myRole==='Player' && data.mySocketId == App.mySocketId ){
-            console.log('ball has arrived for me ! Update mbile phone!');
+            console.log('ball has arrived for me ! Update mobile phone!');
             App.Player.isFlying=false;
             App.Player.toggleFlyMode();
             }
@@ -190,6 +260,8 @@ var App={
         currentRound: 0,
         playerTurn: 0,
         whosPlayerTurn:[],
+        numberOfShoots:3,
+        numberOfTargets:3,
 
         /* *************************************
          *                Setup                *
@@ -206,7 +278,10 @@ var App={
             App.$doc = $(document);
             // Templates
             App.$gameArea = $('#gameArea');
-            App.$templateIntroScreen = $('#intro-screen-template').html();
+            App.$templateIntroScreenMobile = $('#intro-screen-template-mobile').html();
+            App.$newMobileTemplate = $('#new-mobile-template').html();
+            App.$templateIntroScreenBrowser = $('#intro-screen-template-browser').html();
+            App.$browsersDisplayCode = $('#browsers-are-ready').html();
             App.$templateNewGame = $('#create-game-template').html();
             App.$templateJoinGame = $('#join-game-template').html();
             App.$hostGame = $('#host-game-template').html();
@@ -217,25 +292,31 @@ var App={
         bindEvents: function () {
             // Host
             App.$doc.on('click', '#btnCreateGame', App.Host.onCreateClick);
+            App.$doc.on('click', '#beginGameButton', App.browserInitScreen);
             // Player
             App.$doc.on('click', '#btnJoinGameController', App.Player.onJoinClick);
             App.$doc.on('click', '#btnJoinGameBrowser', App.Host.onJoinClick);
-            App.$doc.on('click', '#btnStart',App.Player.onPlayerStartClick);
+            //App.$doc.on('click', '#btnStart',App.Player.onPlayerStartClick);
             App.$doc.on('click', '#btnStartAsBrowser',App.Host.onHostStartClick);
             App.$doc.on('click', '#btnPlayerRestart', App.Player.onPlayerRestart);
-            App.$doc.on('click', '#step00, #step01, #step02', App.Player.customClick);
-            App.$doc.on('mousedown touchstart','#step04', App.Player.changeBackground);
-            App.$doc.on('mouseup touchend', '#step04', App.Player.goThrow);
+            App.$doc.on('click', '#orientationMobile, #azimuthMobile', App.Player.customClick);
+            //App.$doc.on('mousedown touchstart','#forceMobile', App.Player.startCountingForce);
+            //App.$doc.on('mouseup touchend', '#forceMobile', App.Player.stopCountingForce);
+            App.$doc.on('touchstart','#forceShield', App.Player.startCountingForce);
+            App.$doc.on('touchend','#forceShield', App.Player.stopCountingForce);
+            App.$doc.on('click','#throwMobile', App.Player.goThrow);
             //App.$doc.on('click', '#shake', App.Player.displayShake);
             //App.$doc.on('click', '#sound', App.Player.displaySound);
             App.$doc.on('click', '#precision', App.Player.displayPrecision);
-            App.$doc.on('mousedown touchstart','#plus', App.Player.zoomIn);
-            App.$doc.on('mouseup touchend','#plus', App.Player.stopZoomIn);
-            App.$doc.on('mousedown touchstart','#minus', App.Player.zoomOut);
+            App.$doc.on('touchstart','#zoomPlus', App.Player.zoomIn);
+            App.$doc.on('touchend','#zoomPlus', App.Player.stopZoomIn);
+            App.$doc.on('touchstart','#zoomMinus', App.Player.zoomOut);
             App.$doc.on('click','#escapeZoom', App.Player.escapeZoom);
-            App.$doc.on('mouseup touchend','#minus', App.Player.stopZoomOut);
+            App.$doc.on('touchend','#zoomMinus', App.Player.stopZoomOut);
             App.$doc.on('click','#debug', App.Player.sendDebug);
-
+            //new player
+            App.$doc.on('click','#welcomeConnectMobile', App.displayConnectionFromMobile);
+            App.$doc.on('click','#connectionButtonMobile', App.Player.onPlayerStartClick);
         },
 
 
@@ -244,15 +325,50 @@ var App={
          * *********************************** */
 
         showInitScreen: function() {
-            App.$gameArea.html(App.$templateIntroScreen);
+            //App.$gameArea.html(App.$templateIntroScreen);
+            var isMobile = App.mobilecheck();
+            if(isMobile===true){
+                console.log('you are a mobile');
+                //App.$gameArea.html(App.$templateIntroScreenMobile);
+                App.$gameArea.html(App.$newMobileTemplate);
+                App.myRole='Player';
+                console.log('i am a ' + App.myRole);
+            }else if(isMobile===false){
+                console.log('you are a browser');
+                App.$gameArea.html(App.$templateIntroScreenBrowser);
+                App.myRole = 'Host';
+                console.log('I am a ' + App.myRole);
+
+            }
+        },
+        browserInitScreen:function(){
+            console.log('click!!!!');
+            console.log('you are a browser');
+            IO.socket.emit('browserWantsToJoinGame',{});
+        },
+        mobilecheck :function() {
+        var check = false;
+        (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
+        console.log('check is...' + check);
+        return check;
+        },
+        displayConnectionFromMobile:function(){
+            console.log('click!!!!');
+            document.getElementById('welcomeScreenMobile').style.display = "none";
+            document.getElementById('connectScreenMobile').style.display = "block";
+        },
+        sendConnectionFromMobile:function(){
+            console.log('send code!!!');
         },
 
         /* *******************************
            *     HOST CODE  (CESIUM)     *
            ******************************* */
         Host : {
+            myHostRole:'',
             players : [],
             playersWithPositions:[],
+            playersColors:[],
             isNewGame : false,
             numPlayersInRoom: 0,
             numBrowsersInRoom:0,
@@ -282,7 +398,7 @@ var App={
             //////////////////
             onCreateClick: function () {
                 console.log('create new game and room!!!!');
-                IO.socket.emit('hostCreateNewGame');
+                //IO.socket.emit('hostCreateNewGame');
                 App.Host.numBrowsersInRoom++;
             },
             onJoinClick: function () {
@@ -290,7 +406,8 @@ var App={
                 App.$gameArea.html(App.$templateJoinGameAsBrowser);
             },
             gameInit: function (data) {
-                App.gameId = data.gameId.toString();
+                //App.gameId = data.gameId.toString();
+                App.gameId = data.gameId;
                 console.log('app game id is : ' + App.gameId);
                 App.mySocketId = data.mySocketId;
                 App.myRole = 'Host';
@@ -307,24 +424,24 @@ var App={
             },
             displayNewGameScreen : function() {
             	console.log('displaynewgame!!!');
-                App.$gameArea.html(App.$templateNewGame);
-                $('#gameURL').text(window.location.href);
-                $('#spanNewGameCode').text(App.gameId);
+                document.getElementById('welcomeText').style.display = "none";
+                document.getElementById('waitForConnectionText').style.display = "block";
             },
             updateWaitingScreen: function(data) {
                 // If this is a restarted game, show the screen.
                 console.log('update waiting screen!');
-                if ( App.Host.isNewGame ) {
+                /*if ( App.Host.isNewGame ) {
                     App.Host.displayNewGameScreen();
                 }
                 $('#playersWaiting')
                     .append('<p/>')
                     .text('Player ' + data.playerName + ' joined the game.');
                 //geolocation here!
-
+                */
                 App.Host.players.push(data);
-                App.Host.numPlayersInRoom += 1;
-                if (App.Host.numPlayersInRoom === 2 && App.Host.numBrowsersInRoom===2) {
+                App.Host.numPlayersInRoom ++;
+                console.log('num players in room = ' + App.Host.numPlayersInRoom);
+                if (App.Host.numPlayersInRoom === 2) {
                     console.log('Room is full. Almost ready!');
                     IO.socket.emit('hostRoomFull',App.gameId);
                     console.log('it is the turn of ' + App.Host.players[App.playerTurn].mySocketId);
@@ -340,14 +457,14 @@ var App={
                     .append('<p/>')
                     .text('an other browser joined the game');
                 App.Host.numBrowsersInRoom += 1;
-                if (App.Host.numPlayersInRoom === 2 && App.Host.numBrowsersInRoom===2) {
-                    console.log('Room is full. Almost ready!');
-                    IO.socket.emit('hostRoomFull',App.gameId);
-                    console.log('it is the turn of ' + App.Host.players[App.playerTurn].mySocketId);
+                if (App.Host.numPlayersInRoom === 2) {
+                    //console.log('Room is full. Almost ready!');
+                    //IO.socket.emit('hostRoomFull',App.gameId);
+                    //console.log('it is the turn of ' + App.Host.players[App.playerTurn].mySocketId);
                     //set the turn
-                    console.log('players are...');
-                    console.log(App.Host.players);
-                    App.whosPlayerTurn = App.Host.players[App.playerTurn].mySocketId;
+                    //console.log('players are...');
+                    //console.log(App.Host.players);
+                    //App.whosPlayerTurn = App.Host.players[App.playerTurn].mySocketId;
                 }
             },
 
@@ -355,26 +472,44 @@ var App={
                 console.log('start game as host!!');
                 App.$gameArea.html(App.$hostGame);
                 ///SCORE STUFFZ
-                $('#player1Score')
-                    .find('.playerName')
-                    .html(App.Host.players[0].playerName);
-                $('#player2Score')
-                    .find('.playerName')
-                    .html(App.Host.players[1].playerName);
-                $('#player1Score').find('.score').attr('id',App.Host.players[0].mySocketId);
-                $('#player2Score').find('.score').attr('id',App.Host.players[1].mySocketId);
+                $('#player1').find('.teamNameToWrite').html(App.Host.playersWithPositions[0].teamName);
+                $('#player2').find('.teamNameToWrite').html(App.Host.playersWithPositions[1].teamName);
+                //$('#player1').find('.scoreToWrite').attr('id',App.Host.playersWithPositions[0].mySocketId);
+                //$('#player2').find('.scoreToWrite').attr('id',App.Host.playersWithPositions[1].mySocketId);
+                //$('#player1').find('.scoreToWrite').attr('id',App.Host.playersWithPositions[0].mySocketId);
+                //$('#player2').find('.scoreToWrite').attr('id',App.Host.playersWithPositions[1].mySocketId);
+                //$('#player1').find('.playerInfos').attr('class',App.Host.playersWithPositions[0].teamColor);
+                //$('#player2').find('.playerInfos').attr('class',App.Host.playersWithPositions[1].teamColor);
+                $('#player1').find('.playerInfos').addClass(App.Host.playersWithPositions[0].teamColor);
+                $('#player2').find('.playerInfos').addClass(App.Host.playersWithPositions[1].teamColor);
+                $('#player1').find('.playerInfos').attr('id',App.Host.playersWithPositions[0].mySocketId);
+                $('#player2').find('.playerInfos').attr('id',App.Host.playersWithPositions[1].mySocketId);
                 //--------------
                 console.log('got the scores right!');
             },
-
+            updateScore:function(data){
+                console.log('update score as browser!!!');
+                console.log('adding' + data.scoreToAdd +' to my score with the id ' + data.mySocketId);
+                var $pScore = $('#' + data.mySocketId).find('.scoreToWrite');
+                $pScore.text( +$pScore.text() + data.scoreToAdd );
+            },
+            updateNumberOfBulletsAvailable:function(data){
+                console.log('update number of bullets available!. this is shoot number' + data.shootCount + 'by socket ' + data.mySocketId);
+                //$('#'+data.mySocketId).addClass('greyed');
+                //toggle class greyed
+                $('#'+data.mySocketId).find('.point'+data.shootCount).css("display", "none");
+                //$('#'+data.mySocketId).find('.point'+data.shootCount).css("background-color", "rgb(125,125,125)");
+                //$("body").css( "background-color", "rgb(255,0,0)");
+            },
             endGame : function(data) {
                console.log('Game is over for HOST');
-                var $p1 = $('#player1Score');
-                var p1Score = +$p1.find('.score').text();
-                var p1Name = $p1.find('.playerName').text();
-                var $p2 = $('#player2Score');
-                var p2Score = +$p2.find('.score').text();
-                var p2Name = $p2.find('.playerName').text();
+               document.getElementById('gameOver').style.display = "block";
+                /*var $p1 = $('#player1');
+                var p1Score = +$p1.find('.scoreToWrite').text();
+                var p1Name = $p1.find('.teamNameToWrite').text();
+                var $p2 = $('#player2');
+                var p2Score = +$p2.find('.scoreToWrite').text();
+                var p2Name = $p2.find('.teamNameToWrite').text();
                 var winner = (p1Score < p2Score) ? p2Name : p1Name;
                 var tie = (p1Score === p2Score);
                 if(tie){
@@ -383,11 +518,29 @@ var App={
                     $('#hostWord').text( winner + ' Wins!!' );
                 }
                 App.Host.numPlayersInRoom = 0;
-                App.Host.isNewGame = true;
+                App.Host.isNewGame = true;*/
             },
             restartGame : function() {
                 App.$gameArea.html(App.$templateNewGame);
                 $('#spanNewGameCode').text(App.gameId);
+            },
+            /////FUNCTION TOGGLE BACKGROUND COLOR -------------
+            toggleBackgroundColor:function(){
+                console.log('toggle background-color and color of target div!');
+                console.log('color of player active is ' + App.Host.playersWithPositions[App.playerTurn].teamColor);
+                if(App.Host.playersWithPositions[App.playerTurn].teamColor ==='red'){
+                    console.log('red!');
+                    $("body").css( "background-color", "rgb(255,205,194)");
+                    $('#gameAreaHost').css("border-color", "rgb(255,76,35)");
+                    $("#targetName").css( "background-color", "rgb(255,76,35)");
+                   // do the same for targetName
+                }else if(App.Host.playersWithPositions[App.playerTurn].teamColor==='blue'){
+                    console.log('blue!');
+                    $("body").css( "background-color", "rgb(237,253,252)");
+                    $('#gameAreaHost').css("border-color", "rgb(0,212,188)");
+                    $("#targetName").css( "background-color", "rgb(0,212,188)");
+                }
+                //$("body").toggleClass("backgroundChangeColor");
             },
             //CESIUM-CODE-----------------------------------------------------------------------
             customInit: function(){
@@ -409,8 +562,6 @@ var App={
                 var transform;
                 //SCORE & TARGETS----------
                 var score=0;
-                var numberOfShoots=3;
-                var numberOfTargets=3;
                 //-------------------------
                 var toleranceKM=600;
                 var playerPosition = new Cesium.Cartesian3.fromDegrees(App.Host.playerLng,App.Host.playerLat,0);
@@ -524,9 +675,15 @@ var App={
 
                 ////FUNCTION CHOOSE RANDOM TARGET------------------
                 function changeTarget(){
-                    if(App.Host.targetCount===numberOfTargets){
-                        console.log('game is over!');
-                        document.getElementById('gameOver').style.display = "block";
+                    console.log('should reset points here!');
+                    $('#'+App.Host.playersWithPositions[0].mySocketId).find('.point1').css("display", "inline-block");
+                    $('#'+App.Host.playersWithPositions[0].mySocketId).find('.point2').css("display", "inline-block");
+                    $('#'+App.Host.playersWithPositions[0].mySocketId).find('.point3').css("display", "inline-block");
+                    $('#'+App.Host.playersWithPositions[1].mySocketId).find('.point1').css("display", "inline-block");
+                    $('#'+App.Host.playersWithPositions[1].mySocketId).find('.point2').css("display", "inline-block");
+                    $('#'+App.Host.playersWithPositions[1].mySocketId).find('.point3').css("display", "inline-block");
+                    if(App.Host.targetCount===App.numberOfTargets){
+                        console.log('send socket to say game is over!');
                         App.Host.targetCount=0;
                         IO.socket.emit('gameIsOver', {gameId:App.gameId});
                     }else{
@@ -544,7 +701,8 @@ var App={
                     console.log('targetposition is :');
                     console.log(targetPosition);
                     console.log('chosen city is' + targetName +' '+targetLat +' '+ targetLng);
-                    document.getElementById("target").innerHTML = targetName;
+                    IO.socket.emit('targetAlert', {gameId:App.gameId, targetName:targetName});
+                    document.getElementById("targetName").innerHTML = targetName;
                     }
                     App.Host.targetCount++;
                 }
@@ -634,7 +792,8 @@ var App={
                     }
                     //Set the camera with boundingsphere and entity view! (https://groups.google.com/forum/#!msg/cesium-dev/ES4tnBr7mx8/mUknrw00BVYJ + https://cesiumjs.org/Cesium/Build/Documentation/EntityView.html)
                     if(isFlying && Cesium.JulianDate.greaterThanOrEquals(viewer.clock.currentTime, publicArrivalTime)===true){
-                        console.log('has arrived');
+                        console.log('has arrived, lets send the socket');
+                        console.log('app.game id = ' + App.gameId);
                         IO.socket.emit('ball_has_arrived', {gameId:App.gameId, mySocketId:App.whosPlayerTurn, 'hasArrived':'hasArrived'});
                         countCam=0;
                         switchPlayers();
@@ -658,16 +817,17 @@ var App={
                 	console.log('switchPlayers()....');
                 	App.Host.shootCount++;
        				console.log('shootCounts = ' + App.Host.shootCount);
-        			if(App.Host.shootCount===numberOfShoots*2+1){
-	        			App.Host.shootCount=0;
+        			if(App.Host.shootCount===App.numberOfShoots*2+1){
+	        			App.Host.shootCount=1;
 	        			console.log('change target!!!');
 	        			changeTarget(); 
-	        		}
+	        		}                    
                 	App.playerTurn = 1-App.playerTurn;
                 	console.log('change player positions...');
 		            App.whosPlayerTurn = App.Host.playersWithPositions[App.playerTurn].mySocketId;
 		            IO.socket.emit('changeTurn', {gameId:App.gameId, mySocketId:App.whosPlayerTurn, 'changeTurn':'changeTurn'});
 		            // change the vars that are needed:
+                    App.Host.toggleBackgroundColor();
 		            App.Host.playerLat = App.Host.playersWithPositions[App.playerTurn].playerLat;
 		            App.Host.playerLng = App.Host.playersWithPositions[App.playerTurn].playerLng;
 		            playerPosition = new Cesium.Cartesian3.fromDegrees(App.Host.playerLng,App.Host.playerLat,0);
@@ -743,12 +903,12 @@ var App={
                     IO.socket.emit('updateScore',{gameId:App.gameId, mySocketId:App.whosPlayerTurn, scoreToAdd: scoreToAdd});
                     /////SCORE STUFFZ
                     //add the correct score to the correct player!
-                    var $pScore = $('#' + App.Host.players[App.playerTurn].mySocketId);
-                    $pScore.text( +$pScore.text() + scoreToAdd );
+                    //var $pScore = $('#' + App.Host.players[App.playerTurn].mySocketId);
+                    //$pScore.text( +$pScore.text() + scoreToAdd );
                     /////////////////
                     //emit the score via socket so that the players can get it..?
                     console.log('distance in km to target= ' + distanceKM);
-                    document.getElementById("score").innerHTML = score;
+                    //document.getElementById("score").innerHTML = score;
                     var distanceLine = entities.add({
                     name : 'distanceLine',
                     polyline : {
@@ -881,6 +1041,8 @@ var App={
         Player : {
             hostSocketId: '',
             myName: '',
+            isRed:true,
+            teamColor:'',
             isMyTurn:'',
             shootCount:0,
             targetCount:0,
@@ -900,6 +1062,7 @@ var App={
             higherForce:0,
             forceChoice:0,
             precisionForce:0,
+            precisionForceToUse:0,
             isFlying:false,
             isButtonForcePressed:false,
             myLoop:'',
@@ -912,6 +1075,7 @@ var App={
             round:'',
             score:'',
             shouldCount:'false',
+            
             onJoinClick: function () {
                 console.log('Join game!!!');
                 App.$gameArea.html(App.$templateJoinGame);
@@ -921,6 +1085,8 @@ var App={
                     gameId : +($('#inputGameId').val()),
                     playerName : $('#inputPlayerName').val() || 'anon'
                 };
+                console.log('trying to join with');
+                console.log(data);
                 IO.socket.emit('playerJoinGame', data);
                 App.myRole = 'Player';
                 App.Player.myName = data.playerName;
@@ -937,11 +1103,11 @@ var App={
             },
             updateWaitingScreen : function(data) {
                 if(IO.socket.id === data.mySocketId){
+                    document.getElementById('connectScreenMobile').style.display = "none";
+                    document.getElementById('waitForConnectionScreenMobile').style.display = "block";
                     App.myRole = 'Player';
                     App.gameId = data.gameId;
-                    $('#playerWaitingMessage')
-                        .append('<p/>')
-                        .text('Joined Game ' + data.gameId + '. Please wait for game to begin.');
+                    document.getElementById("playerWaitingMessage").innerHTML ='You are connected succesfully under the name ' + data.playerName + ' in game n° ' + data.gameId +'. Please wait for other player to begin';
                 }
             },
             gameStart: function(){
@@ -958,15 +1124,24 @@ var App={
             updateScore:function (data){
             	//update score here!
             	//add the correct score to the correct player!
-            	console.log('adding' + data.scoreToAdd +' to my score...');
+            	console.log('adding' + data.scoreToAdd +' to my score with the id ' + data.mySocketId);
                 var $pScore = $('#' + data.mySocketId);
                 $pScore.text( +$pScore.text() + data.scoreToAdd );
                 /////////////////
 
             },
+            alertTarget:function(data){
+                alert('A new target is chosen: '+ data.targetName);
+            },
             endGame : function() {
             	console.log('endgame for player!!!!');
-               document.getElementById('gameOver').style.display = "block";
+                document.getElementById('orientationMobile').style.display = "none";
+                document.getElementById('azimuthMobile').style.display = "none";
+                document.getElementById('forceMobile').style.display = "none";
+                document.getElementById('throwMobile').style.display = "none";
+                document.getElementById('zoomMobile').style.display = "none";
+                document.getElementById('waitMobile').style.display = "none";
+                document.getElementById('gameOverMobile').style.display = "block";
                /* $('#gameArea')
                     .html('<div class="gameOver">Game Over!</div>')
                     .append(
@@ -978,7 +1153,7 @@ var App={
                     );*/
             },
             getLocation:function(){
-                console.log('GET LCOATION!!!!!');
+                console.log('GET LOCATION!!!!!');
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(App.Player.showPosition);
                 } else {
@@ -991,20 +1166,30 @@ var App={
                 App.Player.playerCoordinates.push(App.Player.playerLat,App.Player.playerLng);
                 console.log(App.Player.playerCoordinates);
                 App.Player.isGeolocated=true;
+                //getting the color
                 if(App.Player.isGeolocated===true){
                     console.log('emit socket with position!!!');
-                    IO.socket.emit('sendGeoLocation',{gameId:App.gameId, mySocketId:App.mySocketId, playerLat:App.Player.playerLat, playerLng:App.Player.playerLng});
+                    IO.socket.emit('sendGeoLocation',{gameId:App.gameId, mySocketId:App.mySocketId, playerLat:App.Player.playerLat, playerLng:App.Player.playerLng, teamName:App.Player.myName, teamColor:App.Player.teamColor});
                 }
             },
             customInit: function(){
             console.log('controller init! C est parti');
             console.log('geolocation...');
             App.Player.getLocation();
-            document.getElementById('sliderWrapper').style.display = "none";
+    
+            //decide here of the colors to give to each player...           
+            document.getElementById('controlsScreenMobile').style.display="block";
+            if(App.Player.isRed===false){
+                console.log('i am blue, we change colors!');
+                $(".controlTopBoxMobile").css( "background-color", "rgb(218,232,231)");
+                $(".logoBoxMobile").css( "background-color", "rgb(174,232,228)");
+                $(".helpMobile").css( "background-color", "rgb(0,212,188)");
+                $('.circleImg').attr('src','data/green_circle.png');
+            }
             var dataContainerOrientation = document.getElementById('dataContainerOrientation');
             var dataContainerMotion = document.getElementById('dataContainerMotion');
             var compass = document.getElementById('compass');
-            var elevation = document.getElementById('elevation');
+            var elevation = document.getElementById('elevationImg');
             var angle = document.getElementById('angle');
             var force = document.getElementById('force');
             if(window.DeviceOrientationEvent && App.Player.isFlying===false) {
@@ -1020,17 +1205,24 @@ var App={
                     App.Player.alphaToUse = alpha;
                     App.Player.betaToUse=beta;
                 var roundedBeta = Math.round(App.Player.betaToUse);
-                compass.style.Transform = 'rotate( ' + alpha + 'deg)';
-                compass.style.WebkitTransform = 'rotate( '+ alpha + 'deg)';
-                compass.style.MozTransform = 'rotate(' + alpha + 'deg)';
-                elevation.style.WebkitTransform = 'rotateX(' + App.Player.betaToUse +'deg)';
-                elevation.style.Transform = 'rotateX(' + App.Player.betaToUse +'deg)';
-                elevation.style.MozTransform ='rotateX(' + App.Player.betaToUse +'deg)';
+                compass.style.Transform = 'translate(-50%,-50%) rotate( ' + alpha + 'deg)';
+                compass.style.WebkitTransform = 'translate(-50%,-50%) rotate( '+ alpha + 'deg)';
+                compass.style.MozTransform = 'translate(-50%,-50%) rotate(' + alpha + 'deg)';
+                if(App.Player.betaToUse<=90){
+                elevation.style.WebkitTransform = 'translate(-50%,-50%) rotate(' + App.Player.betaToUse*-1 +'deg)';
+                elevation.style.Transform = 'translate(-50%,-50%) rotate(' + App.Player.betaToUse*-1 +'deg)';
+                elevation.style.MozTransform ='translate(-50%,-50%) rotate(' + App.Player.betaToUse*-1 +'deg)';
+                }
+                if(roundedBeta<=90){
                 angle.innerHTML = roundedBeta;
-                        if(alpha!=null || beta!=null || gamma!=null) 
-                        dataContainerOrientation.innerHTML = '<strong>Orientation</strong><br />alpha: ' + alpha + '<br/>beta: ' + beta + '<br />gamma: ' + gamma;
-                      }, false);
-            }
+                }else if(roundedBeta>90){
+                angle.innerHTML = '90';
+                }
+
+                if(alpha!=null || beta!=null || gamma!=null) 
+                dataContainerOrientation.innerHTML = '<strong>Orientation</strong><br />alpha: ' + alpha + '<br/>beta: ' + beta + '<br />gamma: ' + gamma;
+                }, false);
+                }
             if(window.DeviceMotionEvent && App.Player.isFlying===false) {
             window.addEventListener('devicemotion', function(event) {
                         var x;
@@ -1057,7 +1249,7 @@ var App={
                         }else if(App.Player.clickCount==1){
                           //socket.emit('send_data_angle',{alpha:App.Player.alphaToUse});
                           IO.socket.emit('send_data_angle',{gameId:App.gameId, mySocketId:App.mySocketId, alpha: App.Player.alphaToUse});
-                          console.log('alpha : ' + App.Player.alphaToUse + 'gameId = ' + App.gameId +'mySocketId = ' + App.mySocketId);
+                          //console.log('alpha : ' + App.Player.alphaToUse + 'gameId = ' + App.gameId +'mySocketId = ' + App.mySocketId);
 
                         }else if(App.Player.clickCount==2 && App.Player.betaToUse>=0 && App.Player.betaToUse<=90){
                           //socket.emit('send_data_elevation',{beta:App.Player.betaToUse});
@@ -1086,64 +1278,63 @@ var App={
                 App.Player.clickCount++;
                 console.log(App.Player.clickCount);
                 if(App.Player.clickCount==0){
-                document.getElementById('step00').style.display = "block";
-                document.getElementById('step01').style.display = "none";
-                document.getElementById('step02').style.display = "none";
-                document.getElementById('step03').style.display = "none";
-                document.getElementById('step04').style.display = "none";
+                document.getElementById('waitMobile').style.display = "block";
+                document.getElementById('orientationMobile').style.display = "none";
+                document.getElementById('azimuthMobile').style.display = "none";
+                document.getElementById('forceMobile').style.display = "none";
+                document.getElementById('throwMobile').style.display = "none";
                 document.getElementById('dataContainerOrientation').style.display = "none";
                 document.getElementById('dataContainerMotion').style.display = "none";
-                document.getElementById('sliderWrapper').style.display = "none";
+                document.getElementById('zoomMobile').style.display = "none";
                 }
                 if(App.Player.clickCount==1){
-                document.getElementById('step00').style.display = "none";
-                document.getElementById('step01').style.display = "block";
-                document.getElementById('step02').style.display = "none";
-                document.getElementById('step03').style.display = "none";
+                document.getElementById('waitMobile').style.display = "none";
+                document.getElementById('orientationMobile').style.display = "block";
+                document.getElementById('azimuthMobile').style.display = "none";
+                document.getElementById('forceMobile').style.display = "none";
                 document.getElementById('dataContainerOrientation').style.display = "none";
                 document.getElementById('dataContainerMotion').style.display = "none";
-                document.getElementById('sliderWrapper').style.display = "none";
+                document.getElementById('zoomMobile').style.display = "none";
                 }
                 if(App.Player.clickCount==2){
-                document.getElementById('step00').style.display = "none";
-                document.getElementById('step01').style.display = "none";
-                document.getElementById('step02').style.display = "block";
-                document.getElementById('step03').style.display = "none";
+                document.getElementById('waitMobile').style.display = "none";
+                document.getElementById('orientationMobile').style.display = "none";
+                document.getElementById('azimuthMobile').style.display = "block";
+                document.getElementById('forceMobile').style.display = "none";
                 document.getElementById('dataContainerOrientation').style.display = "none";
                 document.getElementById('dataContainerMotion').style.display = "none";
-                document.getElementById('sliderWrapper').style.display = "none";
+                document.getElementById('zoomMobile').style.display = "none";
                 }
                 if(App.Player.clickCount==3){
-                App.Player.clickCount++;
                 App.Player.forceChoice=3;
-                /*document.getElementById('step00').style.display = "none";
-                document.getElementById('step01').style.display = "none";
-                document.getElementById('step02').style.display = "none";
-                document.getElementById('step03').style.display = "block";
+                document.getElementById('waitMobile').style.display = "none";
+                document.getElementById('orientationMobile').style.display = "none";
+                document.getElementById('azimuthMobile').style.display = "none";
+                document.getElementById('forceMobile').style.display = "block";
                 document.getElementById('dataContainerOrientation').style.display = "none";
                 document.getElementById('dataContainerMotion').style.display = "none";
-                document.getElementById('sliderWrapper').style.display = "none";*/
+                document.getElementById('zoomMobile').style.display = "none";
                 }
                 if(App.Player.clickCount==4){
-                document.getElementById('step00').style.display = "none";
-                document.getElementById('step01').style.display = "none";
-                document.getElementById('step02').style.display = "none";
-                document.getElementById('step03').style.display = "none";
-                document.getElementById('step04').style.display = "block";
+                document.getElementById('waitMobile').style.display = "none";
+                document.getElementById('orientationMobile').style.display = "none";
+                document.getElementById('azimuthMobile').style.display = "none";
+                document.getElementById('forceMobile').style.display = "none";
+                document.getElementById('throwMobile').style.display = "block";
                 document.getElementById('dataContainerOrientation').style.display = "none";
                 document.getElementById('dataContainerMotion').style.display = "none";
-                document.getElementById('sliderWrapper').style.display = "none";
+                document.getElementById('zoomMobile').style.display = "none";
                 }
                 if(App.Player.clickCount==5){
                 App.Player.clickCount=0;
-                document.getElementById('step00').style.display = "block";
-                document.getElementById('step01').style.display = "none";
-                document.getElementById('step02').style.display = "none";
-                document.getElementById('step03').style.display = "none";
-                document.getElementById('step04').style.display = "none";
+                document.getElementById('waitMobile').style.display = "block";
+                document.getElementById('orientationMobile').style.display = "none";
+                document.getElementById('azimuthMobile').style.display = "none";
+                document.getElementById('forceMobile').style.display = "none";
+                document.getElementById('throwMobile').style.display = "none";
                 document.getElementById('dataContainerOrientation').style.display = "none";
                 document.getElementById('dataContainerMotion').style.display = "none";
-                document.getElementById('sliderWrapper').style.display = "none";
+                document.getElementById('zoomMobile').style.display = "none";
                 }
             },
             displayShake: function(){
@@ -1163,12 +1354,9 @@ var App={
                 console.log('forceChoice = ' +App.Player.forceChoice);
                 App.Player.customClick();
             },
-            changeBackground: function(){
-                var wrapperPlayer = document.getElementById('wrapperPlayer');
-                console.log('changeBackground!!!');
+            startCountingForce: function(){
+                console.log('start counting force!!!');
                 App.Player.isButtonForcePressed=true;
-                wrapperPlayer.style.background = "red";
-                console.log('change background!!!!');
                 console.log('you have clicked');
                 App.Player.precisionForce=0;
                 App.Player.shouldCount=true;
@@ -1181,48 +1369,41 @@ var App={
                     console.log('SET INTERVAL!');
                 }
             },
-            goThrow: function(){
-            	console.log('function gothrow');
+            stopCountingForce:function(){
+                console.log('function stop counting force');
                 var force = document.getElementById('force');
-                var wrapperPlayer = document.getElementById('wrapperPlayer');
-                console.log('throw!');
                 App.Player.isButtonForcePressed=false;    
-                document.body.style.background = "blue";
-                //wrapperPlayer.style.backgroundImage = "url('textures/background.jpg')";
-                wrapperPlayer.style.backgroundSize ="cover";
-                wrapperPlayer.style.backgroundRepeat ="no-repeat";
-                App.Player.isFlying=true;
-                App.Player.toggleFlyMode();
-               /*if(App.Player.forceChoice==1){
-                //shake
-                IO.socket.emit('send_data_force',{gameId:App.gameId, mySocketId:App.mySocketId,force: App.Player.higherForce});
-                IO.socket.emit('throw',{gameId:App.gameId, mySocketId:App.mySocketId});
-                App.Player.forceChoice=0;
-                }
-                 if(App.Player.forceChoice==2){
-                //sound
-                IO.socket.emit('send_data_force',{gameId:App.gameId, mySocketId:App.mySocketId,force: App.Player.higherVolume});
-                IO.socket.emit('throw',{gameId:App.gameId, mySocketId:App.mySocketId});
-                console.log('stop registering....');
-                App.Player.isNeedingSound=false; 
-                App.Player.forceChoice=0; 
-                }*/
-                 if(App.Player.forceChoice===3  && App.Player.shouldCount===true){
-                //precision
-                //App.Player.shouldCount=false;
-                //clearInterval(App.Player.myLoop);
-                //clearTimeout(App.Player.myLoop);
-                //console.log('KILL INTERVAL');
-                //App.Player.shouldCount=false;
-      			console.log('gothrow function forcechoice=3');
-                console.log(App.Player.precisionForce);
-                IO.socket.emit('send_data_force',{gameId:App.gameId, mySocketId:App.mySocketId,force: App.Player.precisionForce});
-                IO.socket.emit('throw',{gameId:App.gameId, mySocketId:App.mySocketId});
-                App.Player.forceChoice=0;
-                }
                 clearInterval(App.Player.myLoop);
                 clearTimeout(App.Player.myLoop);
                 console.log('KILL INTERVAL');
+                App.Player.higherForce=0;
+                App.Player.higherVolume=0;
+                App.Player.precisionForce=0;
+                force.innerHTML = "0";
+                console.log('should count is false');
+                App.Player.shouldCount=false;
+                App.Player.customClick();
+            },
+            goThrow: function(){
+            	console.log('function gothrow');
+                var force = document.getElementById('force');
+                console.log('throw!');
+                App.Player.isButtonForcePressed=false;    
+                App.Player.isFlying=true;
+                App.Player.toggleFlyMode();
+                App.Player.shootCount++;
+                if(App.Player.shootCount===App.numberOfShoots+1){
+                    console.log('reset shootcount!');
+                    App.Player.shootCount=0;
+                }
+      			console.log('gothrow function forcechoice=3');
+                console.log('force to use = ' + App.Player.precisionForceToUse);
+                IO.socket.emit('send_data_force',{gameId:App.gameId, mySocketId:App.mySocketId,force: App.Player.precisionForceToUse});
+                IO.socket.emit('throw',{gameId:App.gameId, mySocketId:App.mySocketId, shootCount:App.Player.shootCount});
+                App.Player.forceChoice=0;
+                //clearInterval(App.Player.myLoop);
+                //clearTimeout(App.Player.myLoop);
+                //console.log('KILL INTERVAL');
                 App.Player.higherForce=0;
                 App.Player.higherVolume=0;
                 App.Player.precisionForce=0;
@@ -1254,13 +1435,18 @@ var App={
                 console.log('escape zoom!');
             },
             precisionForceCount:function(){
+                //var forceImg = document.getElementById('forceImg');
                 if(App.Player.shouldCount===true){
-                	console.log('precision force count!!');
+                	console.log('precision force count,change the width of the circle here!');
 	                var force = document.getElementById('force');
 	                App.Player.precisionForce+=1*App.Player.forceMultiplyFactorTouch;
+                    App.Player.precisionForceToUse = App.Player.precisionForce;
 	                console.log('precision Force = ' + App.Player.precisionForce);
-	                var distanceInKm= getCurveCustom(App.Player.precisionForce,App.Player.betaSent,0);
-	                force.innerHTML = Math.round(distanceInKm) + " km" ;
+	                var distanceInKm= App.Player.getCurveCustom(App.Player.precisionForce,App.Player.betaSent,0);
+	                var dimensionToChange = 100+App.Player.precisionForce;
+                    document.getElementById('forceImg').style.width=dimensionToChange+"px" ;
+                     document.getElementById('forceImg').style.height=dimensionToChange+"px" ;
+                    force.innerHTML = Math.round(distanceInKm) + " km" ;
             	}
             },
             launchSound:function(){
@@ -1305,14 +1491,14 @@ var App={
                             }
                             force.innerHTML = roundedVol;
                             var distanceInKm= getCurveCustom(App.Player.higherVolume,App.Player.betaSent,0);
-                            document.getElementById('step00').style.display = "none";
-                            document.getElementById('step01').style.display = "none";
-                            document.getElementById('step02').style.display = "none";
-                            document.getElementById('step03').style.display = "none";
-                            document.getElementById('step04').style.display = "block";
+                            document.getElementById('waitMobile').style.display = "none";
+                            document.getElementById('orientationMobile').style.display = "none";
+                            document.getElementById('azimuthMobile').style.display = "none";
+                            document.getElementById('forceMobile').style.display = "none";
+                            document.getElementById('throwMobile').style.display = "block";
                             document.getElementById('dataContainerOrientation').style.display = "none";
                             document.getElementById('dataContainerMotion').style.display = "none";
-                            document.getElementById('sliderWrapper').style.display = "none";
+                            document.getElementById('zoomMobile').style.display = "none";
                             }
                         };
                         mediaStreamSource.connect(analyser);
@@ -1327,22 +1513,23 @@ var App={
                 console.log('toggle fly mode!');
                 if(App.Player.isFlying===true){
                     console.log('flight in progress');
-                    document.body.style.background = "red";
-                    document.getElementById('step00').style.display = "none";
-                    document.getElementById('step01').style.display = "none";
-                    document.getElementById('step02').style.display = "none";
-                    document.getElementById('step03').style.display = "none";
-                    document.getElementById('step04').style.display = "none";
-                    document.getElementById('sliderWrapper').style.display = "block";
+                    document.getElementById('waitMobile').style.display = "none";
+                    document.getElementById('orientationMobile').style.display = "none";
+                    document.getElementById('azimuthMobile').style.display = "none";
+                    document.getElementById('forceMobile').style.display = "none";
+                    document.getElementById('throwMobile').style.display = "none";
+                    document.getElementById('zoomMobile').style.display = "block";
                 } else if(App.Player.isFlying===false){
                     console.log('not flying');
-                    document.getElementById('sliderWrapper').style.display = "none";
-                    //document.body.style.backgroundImage = "url('textures/background.jpg')";
-                    document.body.style.background = "blue";
-                    document.body.style.backgroundSize ="cover";
-                    document.body.style.backgroundRepeat ="no-repeat";
-                    App.Player.clickCount=-1;
-                    App.Player.customClick();
+                    document.getElementById('zoomMobile').style.display = "none";
+                    document.getElementById('waitMobile').style.display = "block";
+                    document.getElementById('orientationMobile').style.display = "none";
+                    document.getElementById('azimuthMobile').style.display = "none";
+                    document.getElementById('forceMobile').style.display = "none";
+                    document.getElementById('throwMobile').style.display = "none";
+                    document.getElementById('zoomMobile').style.display = "none";
+                    App.Player.clickCount=0;
+                    //App.Player.customClick();
                 }
             },
 
@@ -1367,11 +1554,16 @@ var App={
                     var debugBeta=30;
                     var debugForce = 20;
                     App.Player.isFlying=true;
+                    App.Player.shootCount++;
+                    if(App.Player.shootCount===App.numberOfShoots+1){
+                        console.log('reset shootcount!');
+                        App.Player.shootCount=1;
+                    }
                     App.Player.toggleFlyMode();
                     IO.socket.emit('send_data_angle',{gameId:App.gameId, mySocketId:App.mySocketId,alpha:debugAlpha});
                     IO.socket.emit('send_data_elevation',{gameId:App.gameId, mySocketId:App.mySocketId,beta:debugBeta});
                     IO.socket.emit('send_data_force',{gameId:App.gameId, mySocketId:App.mySocketId,force: debugForce});
-                    IO.socket.emit('throw',{gameId:App.gameId, mySocketId:App.mySocketId});
+                    IO.socket.emit('throw',{gameId:App.gameId, mySocketId:App.mySocketId, shootCount:App.Player.shootCount});
             }
         },
     };

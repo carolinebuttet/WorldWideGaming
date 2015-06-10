@@ -1,0 +1,866 @@
+@import url(../../../Build/Cesium/Widgets/widgets.css);
+
+@font-face {
+font-family: 'Aldo the Apache';
+font-style: normal;
+font-weight: normal;
+src: local('Aldo the Apache'), url('../data/AldotheApache.woff') format('woff');
+}
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow:hidden;
+}
+body{
+  background-color: rgb(237,253,252);
+  padding:10px;
+}
+#gameArea{
+  width:100%;
+  height:100%;
+}
+.clickable {
+     cursor: pointer;
+}
+/*NEW STYLESHEET FOR BROWSER---------------------------------------------------------------------*/
+.inline{
+  display:inline-block;
+}
+#gameAreaHost{
+  width:100%;
+  height:100%;
+  border: 10px solid rgb(0,212,188);
+}
+.backgroundChangeColor{
+  background-color: rgb(255,205,194);
+}
+.wrapper{
+  display:block;
+  width: 100%;
+  height: 100%;
+  padding:5%;
+}
+#buttonsWrapper{
+  width:70%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-transform:translate(-50%,-50%);
+  -moz-transform:translate(-50%,-50%);
+}
+.button{
+  background-color: rgb(0,212,188);
+  width:285px;
+  height:52px;
+  border-radius: 4px;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+  display:block;
+  margin:auto;
+  overflow: hidden;
+  float: left;
+}
+.button p{
+  font-size: 1.5em;
+  color:white;
+  text-align: center;
+  line-height: 52px;
+}
+
+#logo{
+  display: block;
+    margin: auto;
+    max-height: 100%;
+}
+#topBox{
+  background-color:rgb(255,205,194);
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+  width:100%;
+  height:49%;
+  min-width: 600px;
+  min-height: 210px;
+}
+
+#bottomBox{
+  position: relative;
+  margin-top:20px;
+  background-color: rgb(255,121,77);
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+  width:100%;
+  height: 49%;
+  min-width: 600px;
+  min-height: 210px;
+}
+.infoTextBegin{
+  padding:15px;
+  margin-bottom: 20px;
+  background-color: rgb(0,212,188);
+  width: -moz-fit-content;
+    width: -webkit-fit-content;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+.infoTextBegin h1{
+  text-align: center;
+  font-family: 'Aldo the Apache';
+  font-size: 2.4em;
+  color:white;
+  letter-spacing: 5px;
+}
+.helpBrowser{
+  width:30px;
+  height:30px;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+  margin-left:300px;
+  margin-top:10px;
+}
+.helpBrowser p{
+  text-align: center; 
+  line-height: 30px;
+  font-size: 1.2em;
+
+}
+.buttonAndHelpWrapper{
+  width: 295px;
+  height: 52px;
+  margin-left: auto;
+  margin-right: auto;
+}
+/*WELCOME TEXT---------------------------------------------------*/
+#welcomeText{
+  display:block;
+}
+/*WAIT FOR CONNECTION TEXT---------------------------------------*/
+#waitForConnectionText{
+  display:none;
+}
+/*DISPLAYCODE TEXT-----------------------------------------------*/
+#displayCode{
+  display:none;
+}
+/*HELP TEXT------------------------------------------------------*/
+.overlay{
+  display:none;
+  background-color: rgba(199,255,249,0.8);
+  position:absolute;
+  padding:20px;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+.alertBox{
+  background-color: rgb(0,212,188);
+  padding:20px;
+  color:white;
+  text-align: center;
+  line-height: 50px;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+.isActive{
+  display:block;
+}
+#targetOverlay{
+  background-color: rgba(125,125,125,0.8);
+  color:black;
+  display:none;
+}
+#newTargetAlert{
+  background-color: white;
+}
+#scoreResultOverlay{
+  display:none;
+}
+.tutorialTopBox{
+}
+.tutorialBottomBox{
+  margin-top:20px;
+}
+/*HELP FOR MOBILE MOVEMENTS--------------------------*/
+#chooseOrientationImgSequence{
+  width:505px;
+  height:198px;
+  background: transparent url(../data/tuto/orientationSpriteSheet.png) 0 0 no-repeat;
+}
+#chooseElevationimgSequence{
+  width:457px;
+  height:356px;
+  background: transparent url(../data/tuto/elevationSpriteSheet.png) 0 0 no-repeat;
+}
+#chooseForceImgSequence{
+  width:305px;
+  height:385px;
+  background: transparent url(../data/tuto/forceSpriteSheet.png) 0 0 no-repeat;
+}
+#throwImgSequence{
+  width:419px;
+  height:448px;
+  background: transparent url(../data/tuto/throwSpriteSheet.png) 0 0 no-repeat;
+}
+#zoomImgSequence{
+  width:343px;
+  height:429px;
+  background: transparent url(../data/tuto/zoomSpriteSheet.png) 0 0 no-repeat;
+}
+#orientationExplanation{
+}
+#elevationExplanation{
+}
+#forceExplanation{
+}
+#throwExplanation{
+}
+#zoomExplanation{
+}
+/* THROW INFO--------------------------------------------------*/
+.dataDisplayResumeInfo{
+  width:100%;
+  height:100%;
+}
+.dataMobileThrowResume{
+  height:100%;
+  width:31%;
+  display:inline-block;
+}
+.dataMobileThrowResume img{
+  width:100%;
+  height:auto;
+}
+.dataMobileThrowResume p{
+  color:white;
+  text-align: center;
+}
+/*GAME OVER------------------------------------------------------*/
+#gameOverOverlay{
+  display:none;
+  position:absolute;
+  background-color: rgba(199,255,249,0.8);
+  top:0px;
+  left:0px;
+  width: 100%;
+  height:100%;
+}
+#gameOver{
+  font-size: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  -moz-transform: translate(-50%, -60%);
+  -webkit-transform: translate(-50%, -60%);
+  width: 70%;
+  margin-left:auto;
+  color:white;
+  margin-right:auto;
+  text-align: center;
+}
+#gameOver p{
+  line-height: 52px;
+
+}
+#gameOverResult{
+  background-color:rgb(0,212,188);
+  padding:20px;
+  margin-left:auto;
+  margin-right:auto;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+#gameOverResult h1{
+font-family:'Aldo the Apache';
+line-height: 45px;
+font-size: 30px;
+letter-spacing: 7px;
+}
+#gameOverResult p{
+  line-height: 35px;
+}
+#restart{
+  background-color:rgb(0,212,188);
+  width:286px;
+  height:52px;
+  line-height: 52px;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:20px;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+restart p{
+  line-height: 35px;
+}
+
+
+/*END OF BROWSER-------------------------------------------------------------------------------*/
+
+/*NEW STYLESHEET FOR MOBILE---------------------------------------------------------------------*/
+.wrapperMobile{
+  display:block;
+  width:100%;
+  height:100%;
+}
+/*WELCOME SCREEN ------------------------------------------------------------*/
+
+#welcomeScreenMobile{
+  display:block;
+  width:100%;
+  height:100%;
+}
+#controllerArea{
+  width:100%;
+  height:100%;
+  display:block;
+}
+#topBoxMobile{
+  display:block;
+  width:100%;
+  height:24%;
+  background-color: rgb(255,121,77);
+  margin-bottom:10px;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+#bottomBoxMobile{
+  position:relative;
+  width:100%;
+  height:24%;
+  background-color: rgb(255,121,77);
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+.buttonMobile{
+  width:100%;
+  height:60px;
+  background-color: rgb(0,212,188);
+  text-align: center;
+  color:white;
+  line-height: 60px;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+.goBack{
+  position:absolute;
+  top:50%;
+  transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+
+}
+#welcomeConnectMobile{
+  width:70%;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+/*CONNECT SCREEN ------------------------------------------------------------*/
+#connectionButtonMobile{
+  margin-top:10px;
+}
+#connectScreenMobile{
+  display:none;
+  width:100%;
+  height:100%;
+}
+.logoBoxMobile{
+  position:relative;
+  background-color: rgb(255,205,194);
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+  height:49%;
+  width: 100%;
+  margin-bottom:10px;
+}
+.logoBoxMobile img{
+  position:absolute;
+  top:50%;
+  left:50%;
+  max-width:100%;
+  max-height:100%;
+  transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+#connectBottomBoxMobile{
+  position:relative;
+  background-color: rgb(255,121,77);
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+  height:49%;
+  width:100%;
+}
+#connectionButtonsWrapperMobile{
+  width:70%;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+#connectionButtonsWrapperMobile form input {
+  height: 60px;
+  margin-top:10px;
+  width:100%;
+  text-align: center;
+  font-size:1.1em;
+  color: rgb(0,212,188);
+}
+/*WAIT FOR OTHER MOBILE TO CONNECT SCREEN-------*/
+#waitForConnectionScreenMobile{
+  display:none;
+  width:100%;
+  height:100%;
+}
+#waitForOtherMobile{
+  color:white;
+}
+#playerWaitingMessageWrapper{
+  background-color: white;
+  padding:10px;
+  width:70%;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+#playerWaitingMessage{
+  text-align: center;
+  letter-spacing: 0px;
+}
+/*CONTROLS SCREEN ------------------------------------------------------------*/
+#controlsScreenMobile{
+  display:none;
+  width:100%;
+  height:100%;
+}
+.controlsBoxMobile{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:100%;
+  height:100%;
+  transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+.controlTopBoxMobile{
+  position:relative;
+  display:block;
+  width:100%;
+  height:24%;
+  background-color: rgb(232,222,218);
+  margin-bottom:10px;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+/*ORIENTATION SCREEN -------------------------------*/
+#orientationMobileWrapper{
+  display:none;
+  width:100%;
+  height:100%;
+}
+/*AZIMUTH SCREEN -----------------------------------*/
+#azimuthMobileWrapper{
+  display:none;
+  width:100%;
+  height:100%;
+}
+#elevationImg{
+  -webkit-transform-origin:22% 84%;
+  -moz-transform-origin:22% 84%;
+  transform-origin: 22% 84%;
+}
+/*FORCE SCREEN -----------------------------------*/
+#forceMobileWrapper{
+  display:none;
+  width:100%;
+  height:100%;
+}
+#forceImg{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width:30px;
+  height:30px;
+  transform: translate(-50%,-50%);
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  border-radius:50%;
+  border:5px solid white;
+}
+.shield{
+  position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    -moz-user-select: none; 
+    -khtml-user-select: none; 
+    -webkit-user-select: none; 
+    -o-user-select: none; 
+    user-select: none;
+}
+/*THROW SCREEN -----------------------------------*/
+#throwMobileWrapper{
+  display:none;
+  width:100%;
+  height:100%;
+}
+/*ZOOM SCREEN -----------------------------------*/
+#zoomMobileWrapper{
+  display:none;
+  width:100%;
+  height:100%;  
+}
+#zoomPlus{
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  width:100px;
+  height:100px;
+}
+#zoomMinus{
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  width:100px;
+  height:100px;
+}
+/*ENABLE CHANGE TURN MOBILE-----------------------*/
+#enableChangeTurnWrapper{
+  display:none;
+  width: 100%;
+  height:100%;
+}
+#zoomRestart{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+  width:80px;
+  height:80px;
+}
+#zoomRestartPlus{
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  width:80px;
+  height:80px;
+}
+#zoomRestartMinus{
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  width:80px;
+  height:80px;
+}
+
+/*WAIT SCREEN -----------------------------------*/
+#waitMobileWrapper{
+  display:block;
+  width:100%;
+  height:100%;
+}
+/*GAME OVER MOBILE SCREEN----------------------------*/
+#gameOverMobileWrapper{
+  display:none;
+  width:100%;
+  height:100%;
+}
+#gameOverMobile{
+  display:none;
+  width:100%;
+  height:100%;
+}
+.controlsBoxMobile{
+  position:relative;
+  background-color: rgb(255,205,194);
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+  height:49%;
+  width: 100%;
+  margin-bottom:10px;
+}
+.controlsBoxMobile img{
+  position:absolute;
+  top:50%;
+  left:50%;
+  max-width:100%;
+  max-height:100%;
+  transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+/*HELP SCREEN-----------------------------------------*/
+.helpMobile{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  width:50px;
+  height:50px;
+  border-radius: 50%;
+  background-color: rgb(255,121,77);
+  color:white;
+  text-align: center;
+  line-height: 50px;
+  font-size: 1.5em;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+.infoboxMobile{
+  display:none;
+  width:70%;
+  padding:10px;
+  color:white;
+  background-color: rgb(255,121,77);
+  text-align: center;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+.infoboxMobile p{
+  letter-spacing: 1px;
+}
+.dataDisplayWrapperMobile{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+.dataDisplayMobile{
+  width:100%;
+  height:100%;
+  text-align: center;
+  color: white;
+  font-size: 1.5em;
+}
+/*END OF MOBILE-------------------------------------------------------------------------------*/
+
+/* NEW BROWSER STYLESHEET----------------------------------------------------------------------*/
+.wrapperGame{
+  width:100%;
+  height: 100%;
+  padding:5%;
+}
+.blue > .teamName{
+  background-color: rgb(64,255,233);
+}
+.red > .teamName{
+  background-color: rgb(255,121,77);
+}
+.blue > .score{
+  background-color: rgb(0,212,188);
+}
+.red > .score{
+  background-color: rgb(255,76,35);
+}
+.blue > .pointsWrapper > * {
+  background-color: rgb(0,212,188);
+}
+.red > .pointsWrapper > * {
+  background-color: rgb(255,76,35);
+}
+.greyed{
+  background-color:yellow;
+}
+
+#player1{
+  position:fixed;
+  top: 6%;
+  left: 2%;
+}
+#player2{
+  position:fixed;
+  bottom: 4%;
+  right: 2%;
+}
+#scorep1{
+  /*background-color: rgb(0,212,188);*/
+  margin-top:-54px;
+}
+#scorep2{
+  /*background-color: rgb(255,76,35);*/
+  margin-top: -55px;
+    margin-left: 227px;
+}
+.score{
+  border-radius: 50px;
+  width: 75px;
+  height: 75px;
+  color:white;
+  text-align: center; 
+  line-height: 75px;
+  z-index: 1;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+.teamName{
+  z-index: -1;
+  min-width:190px;
+  height: 35px;
+  color:white;
+  text-align: left; 
+  line-height: 35px;
+  margin-left:60px;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+.teamName h1{
+  font-family:'Aldo the Apache';
+}
+#teamNamep1{
+  /*background-color: rgb(64,255,233);*/
+  padding-left: 25px;
+}
+#teamNamep2{
+  margin-right:10px;
+  /*background-color: rgb(255,121,77);*/
+  margin-top: 45px;
+  padding-left: 10px;
+}
+.pointsWrapper{
+}
+#pointsWrapperp1{
+  float: right;
+    margin-top: -81px;
+
+}
+#pointsWrapperp1 > *{
+}
+#pointsWrapperp2{
+  float:right;
+  margin-right: 77px;
+  margin-top: -13px;
+}
+#pointsWrapperp2 > *{
+}
+.pointsWrapper > *{
+  width:15px;
+  height:15px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+.point{
+  width:15px;
+  height:15px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+
+#target{
+  right: 10px;
+  top: 50px;
+  position:absolute;
+}
+#targetName{
+  background-color: rgb(0,212,188);
+  width:315px;
+  height:55px;
+  color:white;
+  line-height: 55px;
+  text-align: left;
+  padding-left:10px;
+  box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
+}
+#targetLogo img{
+  margin-top: -85px;
+    margin-left: 174px;
+}
+
+/*CESIUM STYLESHEET-----------------------------------*/
+      
+      .cesium-viewer .cesium-widget-credits {
+        display: none;
+      }
+      
+      #isConnected{
+        /*display:none;*/
+      }
+      
+      #connect{
+        text-align: center;
+        position: absolute;
+        left:50%;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        -moz-transform: translateY(-50%);
+        -o-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        -webkit-transform: translateX(-50%);
+        -moz-transform: translateX(-50%);
+        -o-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+        transform: translateX(-50%); 
+      }
+      #playerScores{
+        background-color:white;
+        position:aboslute;
+        bottom:20px;
+        left:20px;
+      }
+      #gameOverPlayer{
+        background-color:red;
+        position:absolute;
+        top:20px;
+        display:none;
+        z-index:4;
+        
+      }
+      #cesiumContainer{
+        width:100%;
+        height:100%;
+      }
+      .staticMap{
+        display:none;
+        position:absolute;
+        background-color: white;
+        z-index:1;
+        right:20px;
+        bottom:40px;
+        width:300px;
+        height:200px;
+        padding:10px;
+      }
+      .infos{
+        position:absolute;
+        background-color: rgba(255, 255, 255, 0.3);
+        z-index:2;
+        color: white;
+        font-weight: 30px;
+        margin:10px;
+        padding:10px;
+      }
+      .mapToShow img{
+      }
+      #force, #angle, #elevation, #score{
+        float:right;
+      }

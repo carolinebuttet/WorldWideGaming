@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <!-- Ensure that everything scales appropriately on a mobile device -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400' rel='stylesheet' type='text/css'>
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body onload='androidInit()'>
+    <div id="gameArea">
+
+    <!-- This is where the templates defined below will be used -->
+    </div>
+
+    <!-- MAIN CONNECT SCREEN HOST-->
+    <script id="intro-screen-template-browser" type="text/template">
+        <div class ='wrapper'>
+    <div id='topBox'>
+      <img id='logo' src="data/newLogo/logo_basic.png">
+    </div>
+    <div id ='bottomBox'>
+      <div id='buttonsWrapper'>
+        <div id='welcomeText'>
+          <div class='infoTextBegin'><h1>welcome to world wide gaming!</h1></div>
+          <div class='buttonAndHelpWrapper'>
+            <div class='button' id='beginGameButton'>
+              <p>begin game ! </p>
+            </div>
+            <div class='helpBrowser'><p>?</p></div>
+          </div>
+        </div>
+        <div id='waitForConnectionText'>
+          <div class='infoTextBegin'><h1>waiting for an other player...</h1></div>
+        </div>        
+        <div id='displayCode'>
+          <div class='infoTextBegin'><h1>connect your phone with code</h1></div>
+          <div class='infoTextBegin'><h1 id='codeToDisplay'></h1></div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </script>
+
+
+     <!-- MAIN CONNECT SCREEN MOBILE!-->
+
+    <script id="intro-screen-template-mobile" type="text/template">
+        <div class="titleWrapper">
+            <div class="title">
+                world wide gaming AS CONTROLLER
+            </div>
+            <div class="buttons">
+                <button id="btnCreateGame" class="btn left">CREATE</button>
+                <button id="btnJoinGameController" class="btn right">JOIN AS CONTROLLER</button>
+                <button id="btnJoinGameBrowser" class="btn middle">JOIN AS BROWSER</button>
+                <div style="clear:both"></div>
+            </div>
+        </div>
+    </script>
+
+
+    <!-- NEW MOBILE TEMPLATE -->
+
+    <script id="new-mobile-template" type="text/template">
+       <div class ='wrapperMobile'>
+        <div id='controllerArea'>
+            <div id='welcomeScreenMobile'>
+                <div id='topBoxMobile'></div>
+                <div class='logoBoxMobile'>
+                    <img src="data/newLogo/logo_basic.png">
+                </div>
+                <div id='bottomBoxMobile'>
+                    <div class='buttonMobile clickable' id='welcomeConnectMobile'>
+                        <p>connect</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MOBILE CONNECT SCREEN -->
+
+            <div id='connectScreenMobile'>
+                <div class='logoBoxMobile'>
+                    <img class='logoImgMobile' src="data/newLogo/logo_basic.png">
+                </div>
+                <div id='connectBottomBoxMobile'>
+                    <div id='connectionButtonsWrapperMobile'>
+                        <form><input id='inputPlayerName' type="text" name="teamName" placeholder="city name"></form>
+                        <form><input id='inputGameId' type="tel" name="code" maxlength='5' placeholder="code"></form>
+                        <div class='buttonMobile clickable' id='connectionButtonMobile'>
+                            <p>connect</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MOBLILE WAIT FOR CONNECTION SCREEN -->
+
+            <div id='waitForConnectionScreenMobile'>
+                <div class='logoBoxMobile'>
+                    <img class='logoImgMobile' src="data/newLogo/logo_basic.png">
+                </div>
+                <div id='connectBottomBoxMobile'>
+                <div id='playerWaitingMessageWrapper'>
+                    <p id='playerWaitingMessage'></p>
+                </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </script>
+
+    <!-- This is the 'Player' screen. Mobile HTML goes here! -->
+
+    <script id="player-game-template" type="text/template">
+            <div id='controlsScreenMobile'>
+                <button id='debug' class='clickable'>send debug</button>
+            <!--MOBILE CHOOSE ORIENTATION-->
+                <div  id='orientationMobileWrapper'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1 id='angleToDisplay'>15</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile clickable' id='orientationMobile'>
+                        <img class='circleImg' src="data/orange_circle.png">
+                        <img src="data/orientation.png" id="compass">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='goBack greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                        <div class='helpMobile clickable' id='helpOrientation'><p>?</p></div>
+                        <div class='changeTurn greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                    </div>
+                </div>
+
+                <!--MOBILE CHOOSE AZIMUTH -->
+
+                <div id='azimuthMobileWrapper'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1 id='angle'>15</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile clickable' id='azimuthMobile'>
+                        <img class='circleImg' src="data/orange_circle.png">
+                        <img src="data/elevation_fixed_s.png">
+                        <img src="data/elevation_moves_s.png" id= "elevationImg">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='goBack clickable'>
+                            <img src='data/discard.png'>
+                        </div>
+                        <div class='helpMobile clickable' id='helpElevation'><p>?</p></div>
+                        <div class='changeTurn greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                    </div>
+                </div>
+
+                <!--MOBILE CHOOSE FORCE -->
+
+                <div id='forceMobileWrapper' onload='androidInit()'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1 id='force'></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile clickable' id='forceMobile'>
+                        <img class='circleImg' class='dontTouch' src="data/orange_circle.png">
+                        <img class='dontTouch' src="data/force.png" id='precision'>
+                        <div class='dontTouch' id='forceImg'></div>
+                        <div class='shield' id='forceShield'></div>
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='goBack clickable'>
+                            <img src='data/discard.png'>
+                        </div>
+                        <div class='helpMobile clickable' id='helpForce'><p>?</p></div>
+                        <div class='changeTurn greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                    </div>
+                </div>
+
+                <!--MOBILE THROW -->
+
+                <div id='throwMobileWrapper'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayResumeInfo'>
+                            <div class='dataMobileThrowResume'>
+                                <img src="data/orientationMini.png">
+                                <p id='orientationMobileResume' >15</p>
+                            </div>
+                            <div class='dataMobileThrowResume'>
+                                <img src="data/elevationMini.png">
+                                <p id='elevationMobileResume'>37</p>
+                            </div>
+                            <div class='dataMobileThrowResume'>
+                                <img src="data/forceMini.png">
+                                <p id='forceMobileResume' >1279</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile clickable' id='throwMobile'>
+                        <img class='circleImg' src="data/orange_circle.png">
+                        <img src="data/throw.png">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='goBack clickable'>
+                            <img src='data/discard.png'>
+                        </div>
+                        <div class='dataDisplayMobile'>
+                            <h1 id='shakeForce'>0</h1>
+                        </div>
+                        <div class='helpMobile clickable' id='helpThrow'><p>?</p></div>
+                        <div class='changeTurn greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                    </div>
+                </div>
+
+                <!--MOBILE ZOOM (WAIT WHILE FLYING) -->
+
+                <div id='zoomMobileWrapper'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile clickable' id='zoomMobile'>
+                        <img class='waitMobileImg' src="data/newLogo/logo_wait_orange.png">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='goBack greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                        <div class='helpMobile greyed'><p>?</p></div>
+                        <div class='changeTurn greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                    </div>
+                </div>
+
+                <!--MOBILE FINISH TURN -->
+                <div id='enableChangeTurnWrapper'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile' id='enableRestartMobile'>
+                       <img class='circleImg' src="data/orange_circle.png">
+                        <img src="data/zoom.png">
+                        <div class='shield clickable' id='zoomRestartPlus'></div>
+                        <div class='shield clickable' id='zoomRestartMinus'></div>
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='goBack greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                        <div class='helpMobile clickable' id='helpZoom'><p>?</p></div>
+                        <div class='changeTurn clickable' id='zoomRestart'>
+                            <img src='data/discard.png'>
+                        </div>
+                    </div>
+                </div>
+
+                <!--MOBILE  WAIT-->
+                
+                <div id='waitMobileWrapper'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile' id='waitMobile'>
+                        <img class='waitMobileImg' src="data/newLogo/logo_wait_orange.png">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='goBack greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                        <div class='helpMobile clickable' id='helpWait'><p>?</p></div>
+                        <div class='changeTurn greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                    </div>
+                </div>
+
+                <!--MOBILE GAME OVER SCREEN -->
+
+                <div id='gameOverMobile'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile'>
+                        <img id='gameOverImgMobile' src="data/newLogo/game_over_orange.png">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='goBack greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                        <div class='helpMobile greyed'><p>?</p></div>
+                        <div class='changeTurn greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                    </div>
+                </div>
+                <div id='dataContainerOrientation'></div>
+                <div id='dataContainerMotion'></div>
+            </div>
+    </script>
+  
+    <!-- This is the 'Host' screen. Cesium goes here! -->
+
+    <script id="host-game-template" type="text/template">
+        <div class ='wrapperGame'>
+        <div id='gameAreaHost'>
+            <div class='staticMap'>
+              <div class='mapToShow'>
+                <img id='staticImg' src='http://dev.virtualearth.net/REST/v1/Imagery/Map/Aerial/46.54, 6.59/15?mapSize=300,200&key=AvRFjXkotEcTdjuZLdPtg2JqWv3yKtMLkBeQnQvQ7nERmEWpdpxqP9itXTf55Yb9'>
+              </div>
+            </div>
+           <div id="cesiumContainer" class="fullSize"></div>
+
+           <!--HOST GAME INFOS  -->
+
+            <div id='gameInfos'>
+                
+                 <!--HOST PLAYERS-->
+
+                <div id='players'>
+
+                 <!--HOST PALYER 1-->
+                
+                    <div id='player1'>
+                        <div class='playerInfos'>
+                            <div class='teamName' id='teamNamep1'>
+                                <h2 class='teamNameToWrite'>LAUSANNE </h2>
+                            </div>
+                            <div class='score' id='scorep1'>
+                                <h1 class='scoreToWrite'>0</h1>
+                            </div>
+                            <div class='pointsWrapper' id='pointsWrapperp1'>
+                                <div class='point1'></div>
+                                <div class='point2'></div>
+                                <div class='point3'></div>
+                            </div>
+                        </div>
+                    </div>
+
+                     <!--HOST PLAYER 2 -->
+
+                    <div id ='player2'>
+                        <div class='playerInfos'>
+                            <div class='pointsWrapper' id='pointsWrapperp2'>
+                                <div class='point1'></div>
+                                <div class='point2'></div>
+                                <div class='point3'></div>
+                            </div>
+                            <div class='score' id='scorep2'>
+                                <h1 class='scoreToWrite'>0</h1>
+                            </div>
+                            <div class='teamName' id='teamNamep2'>
+                                <h2 class='teamNameToWrite'>BRUXELLES</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!--HOST TARGET-->
+
+                <div id='target'>
+                    <div id='targetNameWrapper'>
+                        <h1 id='targetName'>target</h1>
+                    </div>
+                </div>
+            </div>
+
+             <!--HOST TARGET CHOICE OVERLAY-->
+
+            <div class='overlay' id='targetOverlay'>
+                <div class='alertBox' id='newTargetAlert'>
+                    <div><p>A new target is chosen:&nbsp;</p><p id='targetToWrite'>target name</p></div>
+                </div>
+            </div>
+
+             <!--HOST SCORE DISPLAY OVERLAY-->
+            
+            <div class='overlay' id='scoreResultOverlay'>
+                <div class='alertBox' id='newScore'>
+                <div><p style="display:inline-block">You landed &nbsp;</p><p style="display:inline-block" id='scoreInKmToDisplay'></p><p style="display:inline-block">&nbsp;kilometers from the target</p></div>
+                </div>
+            </div>
+
+            <!--HOST TUTORIAL OVERLAY-->
+
+            <div class='tutorialOverlay' id='tutorialOverlayOrientation'>
+                <div class='tutorialTopBox alertBox'>
+                    <div id='chooseOrientationImgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                    <div id='orientationExplanation'>
+                        <h1>Choose orientation!</h1>
+                        <p>Point your phone towards the direction of the target, <br>and validate with<br>a click!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class='tutorialOverlay' id='tutorialOverlayElevation'>
+                <div class='tutorialTopBox alertBox'>
+                    <div id='chooseElevationimgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                    <div id='elevationExplanation'>
+                        <h1>Choose elevation!</h1>
+                        <p>Tilt your phone to get the angle<br>of your shoot, and validate<br>with a click!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class='tutorialOverlay' id='tutorialOverlayForce'>
+                <div class='tutorialTopBox alertBox'>
+                        <div id='chooseForceImgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                        <div id='forceExplanation'>
+                            <h1>Choose the force!</h1>
+                            <p>Press to increase the force<br>and thus the distance!</p>
+                        </div>
+                </div>
+            </div>
+            
+            <div class='tutorialOverlay' id='tutorialOverlayThrow'>
+                <div class='tutorialTopBox alertBox'>
+                    <div id='throwImgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                    <div id='zoomExplanation'>
+                        <h1>Throw it!</h1>
+                        <p>Throw your phone <br>(but keep it in<br>your hand!)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class='tutorialOverlay' id='tutorialOverlayZoom'>
+                <div class='tutorialTopBox alertBox'>
+                    <div id='zoomImgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                    <div id='zoomExplanation'>
+                        <h1>Zoom out!</h1>
+                        <p>You can zoom in or out<br>with your thumb<br>to see where<br>you landed</p>
+                    </div>
+                </div>
+            </div>
+
+             <!--HOST GAME OVER OVERLAY-->
+
+            <div id='gameOverOverlay'>
+                <div id='gameOver'>
+                    <img id='gameOverHostImg' src="data/newLogo/game_over_green.png">
+                    <div id='gameOverResult'>
+                        <h1 class='inline'>city</h1>
+                        <h1 class='inline' id='winnerTeamToWrite'>XXX</h1>
+                        <h1 class='inline'>won with only </h1>
+                        <h1 class='inline' id ='winnerScoreToWrite'>XXX</h1>
+                        <h1 class='inline' >km of unacurracy!</h1>
+                    </div>
+                    <div id='restart'>
+                        <p>restart</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </script>
+
+    <script src="../../Build/Cesium/Cesium.js"></script>
+    <script src="libs/jquery-2.0.2.min.js"></script>
+    <script src="libs/jquery.spritely.js" type="text/javascript"></script>
+    <script src="libs/textFit.min.js"></script>
+    <script src="libs/fastclick.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="mainCesium3.js"></script>
+    <script>
+    function testBody(){
+    console.log('this is a test for the body');
+    }
+    </script>
+    <script>
+    //this is a script to prevent the menu from appearing in android
+    function absorbEvent_(event) {
+      var e = event || window.event;
+      e.preventDefault && e.preventDefault();
+      e.stopPropagation && e.stopPropagation();
+      e.cancelBubble = true;
+      e.returnValue = false;
+      return false;
+    }
+
+    function preventLongPressMenu(node) {
+      node.ontouchstart = absorbEvent_;
+      node.ontouchmove = absorbEvent_;
+      node.ontouchend = absorbEvent_;
+      node.ontouchcancel = absorbEvent_;
+    }
+
+    function androidInit() {
+        console.log('init android stuff!!!');
+        //preventLongPressMenu(document.getElementById('theimage'));
+        //document.getElementsByClassName()
+        //preventLongPressMenu(document.getElementById('controlsScreenMobile'));
+        preventLongPressMenu(document.getElementsByClassName('dontTouch'));
+        console.log('DO NOT TOUCH!!!');
+    }
+  </script>
+
+</body>
+</html>

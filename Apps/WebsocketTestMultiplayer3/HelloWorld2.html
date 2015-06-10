@@ -4,18 +4,232 @@
     <meta charset="utf-8"/>
     <!-- Ensure that everything scales appropriately on a mobile device -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400' rel='stylesheet' type='text/css'>
     <link href="css/styles.css" rel="stylesheet">
 </head>
-<body>
+<body onload='androidInit()'>
     <div id="gameArea">
         <!-- This is where the templates defined below will be used -->
     </div>
 
-    <!-- Main Title Screen that appears when the page loads for the first time -->
-    <script id="intro-screen-template" type="text/template">
+    <!-- Main Title Screen that appears when the page loads for the first time and you're a browser! -->
+    <script id="intro-screen-template-browser" type="text/template">
+        <div class ='wrapper'>
+    <div id='topBox'>
+      <img id='logo' src="data/logo_basic.png">
+    </div>
+    <div id ='bottomBox'>
+      <div id='buttonsWrapper'>
+
+        <!--welcome text -->
+
+        <div id='welcomeText'>
+          <div class='infoTextBegin'><h1>welcome to world wide gaming!</h1></div>
+          <div class='buttonAndHelpWrapper'>
+            <div class='button' id='beginGameButton'>
+              <p>begin game ! </p>
+            </div>
+            <div class='helpBrowser'><p>?</p></div>
+          </div>
+        </div>
+
+        <!--wait for connection code-->
+
+        <div id='waitForConnectionText'>
+          <div class='infoTextBegin'><h1>waiting for an other player...</h1></div>
+        </div>
+
+        <!--display code-->
+        
+        <div id='displayCode'>
+          <div class='infoTextBegin'><h1>connect your phone with code</h1></div>
+          <div class='infoTextBegin'><h1 id='codeToDisplay'></h1></div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </script>
+    <!-- NEW MOBILE TEMPLATE -->
+    <script id="new-mobile-template" type="text/template">
+       <div class ='wrapperMobile'>
+        <div id='controllerArea'>
+            <div id='welcomeScreenMobile'>
+                <div id='topBoxMobile'></div>
+                <div class='logoBoxMobile'>
+                    <img src="data/logo_basic.png">
+                </div>
+                <div id='bottomBoxMobile'>
+                    <div class='buttonMobile' id='welcomeConnectMobile'>
+                        <p>connect</p>
+                    </div>
+                </div>
+            </div>
+            <div id='connectScreenMobile'>
+                <div class='logoBoxMobile'>
+                    <img class='logoImgMobile' src="data/logo_basic.png">
+                </div>
+                <div id='connectBottomBoxMobile'>
+                    <div id='connectionButtonsWrapperMobile'>
+                        <div class='buttonMobile' id='connectionButtonMobile'>
+                            <p>connect</p>
+                        </div>
+                        <form><input id='inputPlayerName' type="text" name="teamName" placeholder="team name"></form>
+                        <form><input id='inputGameId' type="tel" name="code" maxlength='5' placeholder="code"></form>
+                    </div>
+                </div>
+            </div>
+            <div id='waitForConnectionScreenMobile'>
+                <div class='logoBoxMobile'>
+                    <img class='logoImgMobile' src="data/logo_basic.png">
+                </div>
+                <div id='connectBottomBoxMobile'>
+                <div id='playerWaitingMessageWrapper'>
+                    <p id='playerWaitingMessage'></p>
+                </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </script>
+
+    <!-- This is the 'Player' screen. Mobile HTML goes here! -->
+    <script id="player-game-template" type="text/template">
+            <div id='controlsScreenMobile'>
+                <div id='myTurn'><h1>My turn!</h1></div>
+                <button id='debug'>send debug</button>
+                <div id='orientationMobile'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1>15</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile'>
+                        <img class='circleImg' src="data/orange_circle.png">
+                        <img src="data/orientation.png" id="compass">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='helpMobile'><p>?</p></div>
+                        <div class='infoboxMobile'><p>turn your phone to get the orientation, click to validate</p></div>
+                    </div>
+                </div>
+                <div id='azimuthMobile'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1 id='angle'>15</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile'>
+                        <img class='circleImg' src="data/orange_circle.png">
+                        <img src="data/elevation_fixed_s.png">
+                        <img src="data/elevation_moves_s.png" id= "elevationImg">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='helpMobile'><p>?</p></div>
+                        <div class='infoboxMobile'><p>tils your phone to get the azimuth click to validate</p></div>
+                    </div>
+                </div>
+                <div id='forceMobile' onload='androidInit()'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1 id='force'></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile'>
+                        <img class='circleImg' class='dontTouch' src="data/orange_circle.png">
+                        <img class='dontTouch' src="data/force.png" id='precision'>
+                        <div class='dontTouch' id='forceImg'></div>
+                        <div class='shield' id='forceShield'></div>
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='helpMobile'><p>?</p></div>
+                        <div class='infoboxMobile'><p>press the circle to increase the force click to validate</p></div>
+                    </div>
+                </div>
+                <div id='throwMobile'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapper'>
+                            <div class='dataDisplayMobile'>
+                                <h1></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile'>
+                        <img class='circleImg' src="data/orange_circle.png">
+                        <img src="data/throw.png">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='helpMobile'><p>?</p></div>
+                        <div class='infoboxMobile'><p>throw your phone to launch the bullet ! (but hold it) click to validate</p></div>
+                    </div>
+                </div>
+                <div id='zoomMobile'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile'>
+                        <img class='circleImg' src="data/orange_circle.png">
+                        <img src="data/zoom.png">
+                         <div class='shield'></div>
+                        <div class='shield' id='zoomPlus'></div>
+                        <div class='shield' id='zoomMinus'></div>
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='helpMobile'><p>?</p></div>
+                        <div class='infoboxMobile'><p>zoom in or out to see where the bullet is going!</p></div>
+                    </div>
+                </div>
+                <div id='waitMobile'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1>wait</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile'>
+                        <img src="data/logo_basic.png">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='helpMobile'><p>?</p></div>
+                        <div class='infoboxMobile'><p>wait for your turn, you impatient bitch!</p></div>
+                    </div>
+                </div>
+                <div id='gameOverMobile'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                                <h1>game over</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile'>
+                        <img src="data/logo_game_over_blue.png">
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                    </div>
+                </div>
+                <div id='dataContainerOrientation'></div>
+                <div id='dataContainerMotion'></div>
+            </div>
+    </script>
+
+
+     <!-- Main Title Screen that appears when the page loads for the first time and you're a mobile!-->
+    <script id="intro-screen-template-mobile" type="text/template">
         <div class="titleWrapper">
             <div class="title">
-                world wide gaming
+                world wide gaming AS CONTROLLER
             </div>
             <div class="buttons">
                 <button id="btnCreateGame" class="btn left">CREATE</button>
@@ -25,16 +239,7 @@
             </div>
         </div>
     </script>
-    <!-- This screen appears when a user clicks "CREATE" on the Title Screen -->
-    <script id="create-game-template" type="text/template">
-        <div class="createGameWrapper">
-            <div class="info">Open this site on your mobile device:</div>
-            <div id="gameURL" class="infoBig">Error!</div>
-            <div class="info">Then click <strong>JOIN</strong> and <br/> enter the following Game ID:</div>
-            <div id="spanNewGameCode" class="gameId">Error!</div>
-            <div id="playersWaiting"></div>
-        </div>
-    </script>
+  
     <!-- This scrreen appears when a player clicks "JOIN AS CONTROLLER" on the Title Screen -->
     <script id="join-game-template" type="text/template">
         <div class="joinGameWrapper">
@@ -53,118 +258,69 @@
             </div>
         </div>
     </script>
-       <!-- This scrreen appears when a player clicks "JOIN AS BROWSER" on the Title Screen -->
-    <script id="join-game-as-browser-template" type="text/template">
-        <div class="joinGameWrapper">
-            <div class="info">
-              <p>You are trying to join as a browser.</p>
-                <label for="inputGameId">Game ID:</label>
-                <input id="inputGameId" type="tel"/>
-            </div>
-            <div class="info buttons">
-                <button id="btnStartAsBrowser" class="btn">Start</button>
-                <div id="playerWaitingMessage"></div>
-            </div>
-        </div>
-    </script>
+
     <!-- This is the 'Host' screen. Cesium goes here! -->
     <script id="host-game-template" type="text/template">
-        <div id="playerScores">
-            <div id="player1Score" class="playerScore">
-                <span class="playerName">Player 1: </span><span class="score">0</span>
-            </div>
-            <div id="player2Score" class="playerScore">
-                <span class="playerName">Player 2: </span><span class="score">0</span>
-            </div>
-        </div>
-
-        <div id='gameOver'>
-        	<h1>Game Over!</h1>
-        </div>
-        <div class='infos'>
-           <table>
-            <tr>
-              <td><h1 id='target'> </h1></td>
-              <td><h1 id='scoreText'>  - score</h1></td>
-              <td><div id ='score'></div></td>
-            </tr>
-          </table>
-        </div>
-        <div class='staticMap'>
-          <div class='mapToShow'>
-            <img id='staticImg' src='http://dev.virtualearth.net/REST/v1/Imagery/Map/Aerial/46.54, 6.59/15?mapSize=300,200&key=AvRFjXkotEcTdjuZLdPtg2JqWv3yKtMLkBeQnQvQ7nERmEWpdpxqP9itXTf55Yb9'>
-          </div>
-        </div>
-        <div id="cesiumContainer" class="fullSize"></div>
-        <div id="loadingOverlay"><h1>Loading...</h1></div>
-        <div id="toolbar"></div>
-    </script>
-   
-    <!-- This is the 'Player' screen. Mobile HTML goes here! -->
-    <script id="player-game-template" type="text/template">
-     <div id="playerScores">
-            <div id="player1Score" class="playerScore">
-                <span class="playerName">Player 1: </span><span class="score">0</span>
-            </div>
-        </div>
-      <div id='isConnected'>
-      <div id='myTurn'><h1>My turn!</h1></div>
-        <div id = 'wrapperPlayer'>
-          <button id='debug'>send debug</button>
-          <div id="containerPlayer">
-            <div id='gameOver'>
-        		<h1>Game Over!</h1>
-      		</div>
-            <div class="start" id="step00">
-              <div class ="image">
-                <h1 class="text">start</h1>
-                <img src='textures/star1.png' class="spin">
+        <div class ='wrapperGame'>
+        <div id='gameAreaHost'>
+            <div class='staticMap'>
+              <div class='mapToShow'>
+                <img id='staticImg' src='http://dev.virtualearth.net/REST/v1/Imagery/Map/Aerial/46.54, 6.59/15?mapSize=300,200&key=AvRFjXkotEcTdjuZLdPtg2JqWv3yKtMLkBeQnQvQ7nERmEWpdpxqP9itXTf55Yb9'>
               </div>
             </div>
-            <div class="start" id="step01">
-              <h1 id ='northing'>N</h1>
-              <div class ="image">
-                <h1 class="text">choose orientation</h1>
-                <img src='textures/compass.png' id="compass">
-              </div>
-            </div>
-            <div class="start" id="step02">
-              <div class ="image">
-                <h1 id ='angle'>10</h1>
-                <h1 class="text">choose elevation</h1>
-                <div id="elevationContainer">
-                  <img src='textures/circle.png' id= "elevation">
+           <div id="cesiumContainer" class="fullSize"></div>
+            <div id='gameInfos'>
+                <div id='players'>
+                    <div id='player1'>
+                        <div class='playerInfos'>
+                            <div class='teamName' id='teamNamep1'>
+                                <h2 class='teamNameToWrite'>Martigny </h2>
+                            </div>
+                            <div class='score' id='scorep1'>
+                                <h1 class='scoreToWrite'>0</h1>
+                            </div>
+                            <div class='pointsWrapper' id='pointsWrapperp1'>
+                                <div class='point1'></div>
+                                <div class='point2'></div>
+                                <div class='point3'></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id ='player2'>
+                        <div class='playerInfos'>
+                            <div class='teamName' id='teamNamep2'>
+                                <h2 class='teamNameToWrite'>Bruxelles</h2>
+                            </div>
+                            <div class='score' id='scorep2'>
+                                <h1 class='scoreToWrite'>0</h1>
+                            </div>
+                            <div class='pointsWrapper' id='pointsWrapperp2'>
+                                <div class='point1'></div>
+                                <div class='point2'></div>
+                                <div class='point3'></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
+                <div id='target'>
+                    <div id='targetNameWrapper'>
+                        <h1 id='targetName'>target</h1>
+                    </div>
+                    <div id='targetLogo'>
+                        <img src="data/logo_game.png">
+                    </div>
+                </div>
             </div>
-            <div class="start" id="step03">
-              <div class ="image">
-                <div class='button' id='precision'>
-                  <h1>precision</h1>
-                </div>          
-              </div>
+            <div id='gameOver'>
+                <img src="data/logo_game_over_blue.png">
+                <div id='gameOverResult'>
+                    <p>team XXX won <br>with XXX points</p>
+                </div>
+                <div id='restart'>
+                    <p>restart</p>
+                </div>
             </div>
-           <div class="start" id="step04">
-              <div class ="image">
-                <h1 id ='force'>0</h1>
-                <h1 class="text">throw it!</h1>
-                <img src='textures/star1.png' class="spin">
-              </div>
-            </div>
-          </div>
-          <div id='dataContainerOrientation'></div>
-          <div id='dataContainerMotion'></div>
-      </div>
-      <div id='sliderWrapper'>
-        <button id='escapeZoom'>escape zoom!</button>
-        <div class='slider' id='plus'>
-          <h1>+</h1>
         </div>
-        <div class='slider' id='minus'>
-          <h1>-</h1>
-        </div>
-      </div>
-
     </div>
     </script>
 
@@ -174,5 +330,37 @@
     <script src="libs/fastclick.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="mainCesium3.js"></script>
+    <script>
+    function testBody(){
+    console.log('this is a test for the body');
+    }
+    </script>
+    <script>
+    //this is a script to prevent the menu from appearing in android
+    function absorbEvent_(event) {
+      var e = event || window.event;
+      e.preventDefault && e.preventDefault();
+      e.stopPropagation && e.stopPropagation();
+      e.cancelBubble = true;
+      e.returnValue = false;
+      return false;
+    }
+
+    function preventLongPressMenu(node) {
+      node.ontouchstart = absorbEvent_;
+      node.ontouchmove = absorbEvent_;
+      node.ontouchend = absorbEvent_;
+      node.ontouchcancel = absorbEvent_;
+    }
+
+    function androidInit() {
+        console.log('init android stuff!!!');
+        //preventLongPressMenu(document.getElementById('theimage'));
+        //document.getElementsByClassName()
+        //preventLongPressMenu(document.getElementById('controlsScreenMobile'));
+        preventLongPressMenu(document.getElementsByClassName('dontTouch'));
+        console.log('DO NOT TOUCH!!!');
+    }
+  </script>
 </body>
 </html>

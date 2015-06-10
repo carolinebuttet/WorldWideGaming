@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <!-- Ensure that everything scales appropriately on a mobile device -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div id="gameArea">
+        <div class ='wrapperGame'>
+        <div id='gameAreaHost'>
+        <div id="cesiumContainer" class="fullSize"></div>
+            <div class='staticMap'>
+              <div class='mapToShow'>
+                <img id='staticImg' src='http://dev.virtualearth.net/REST/v1/Imagery/Map/Aerial/46.54, 6.59/15?mapSize=300,200&key=AvRFjXkotEcTdjuZLdPtg2JqWv3yKtMLkBeQnQvQ7nERmEWpdpxqP9itXTf55Yb9'>
+              </div>
+            </div>
+           <!--HOST GAME INFOS  -->
+
+            <div id='gameInfos'>
+                
+                 <!--HOST PLAYERS-->
+
+                <div id='players'>
+
+                 <!--HOST PALYER 1-->
+                
+                    <div id='player1'>
+                        <div class='playerInfos'>
+                            <div class='teamName' id='teamNamep1'>
+                                <h2 class='teamNameToWrite'>LAUSANNE </h2>
+                            </div>
+                            <div class='score' id='scorep1'>
+                                <h1 class='scoreToWrite'>0</h1>
+                            </div>
+                            <div class='pointsWrapper' id='pointsWrapperp1'>
+                                <div class='point1'></div>
+                                <div class='point2'></div>
+                                <div class='point3'></div>
+                            </div>
+                        </div>
+                    </div>
+
+                     <!--HOST PLAYER 2 -->
+
+                    <div id ='player2'>
+                        <div class='playerInfos'>
+                            <div class='pointsWrapper' id='pointsWrapperp2'>
+                                <div class='point1'></div>
+                                <div class='point2'></div>
+                                <div class='point3'></div>
+                            </div>
+                            <div class='score' id='scorep2'>
+                                <h1 class='scoreToWrite'>0</h1>
+                            </div>
+                            <div class='teamName' id='teamNamep2'>
+                                <h2 class='teamNameToWrite'>BRUXELLES</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!--HOST TARGET-->
+
+                <div id='target'>
+                    <div id='targetNameWrapper'>
+                        <h1 id='targetName'>target</h1>
+                    </div>
+                </div>
+            </div>
+
+             <!--HOST TARGET CHOICE OVERLAY-->
+
+            <div class='overlay' id='targetOverlay'>
+                <div class='alertBox' id='newTargetAlert'>
+                    <div><p>A new target is chosen:</p><p>target name</p></div>
+                </div>
+            </div>
+
+             <!--HOST SCORE DISPLAY OVERLAY-->
+            
+            <div class='overlay' id='scoreResultOverlay'>
+                <div class='alertBox' id='newScore'>
+                   <div><p style="display:inline-block">You landed </p><p style="display:inline-block" id='scoreInKmToDisplay'></p><p style="display:inline-block"> kilometers from the target</p></div>
+                </div>
+            </div>
+
+            <!--HOST TUTORIAL OVERLAY-->
+
+            <div class='tutorialOverlay' id='tutorialOverlayOrientation'>
+                <div class='tutorialTopBox alertBox'>
+                    <div id='chooseOrientationImgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                    <div id='orientationExplanation'>
+                        <h1>Choose orientation!</h1>
+                        <p>Point your phone towards the direction of the target, <br>and validate with<br>a click!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class='tutorialOverlay' id='tutorialOverlayElevation'>
+                <div class='tutorialTopBox alertBox'>
+                    <div id='chooseElevationimgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                    <div id='elevationExplanation'>
+                        <h1>Choose elevation!</h1>
+                        <p>Tilt your phone to get the angle<br>of your shoot, and validate<br>with a click!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class='tutorialOverlay' id='tutorialOverlayForce'>
+                <div class='tutorialTopBox alertBox'>
+                        <div id='chooseForceImgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                        <div id='forceExplanation'>
+                            <h1>Choose the force!</h1>
+                            <p>Press to increase the force<br>and thus the distance!</p>
+                        </div>
+                </div>
+            </div>
+            
+            <div class='tutorialOverlay' id='tutorialOverlayThrow'>
+                <div class='tutorialTopBox alertBox'>
+                    <div id='throwImgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                    <div id='zoomExplanation'>
+                        <h1>Throw it!</h1>
+                        <p>Throw your phone <br>(but keep it in<br>your hand!)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class='tutorialOverlay' id='tutorialOverlayZoom'>
+                <div class='tutorialTopBox alertBox'>
+                    <div id='zoomImgSequence'></div>
+                </div>
+                <div class='tutorialBottomBox alertBox'>
+                    <div id='zoomExplanation'>
+                        <h1>Zoom out!</h1>
+                        <p>You can zoom in or out<br>with your thumb<br>to see where<br>you landed</p>
+                    </div>
+                </div>
+            </div>
+
+             <!--HOST GAME OVER OVERLAY-->
+
+            <div id='gameOverOverlay'>
+                <div id='gameOver'>
+                    <img id='gameOverHostImg' src="game_over_green.png">
+                    <div id='gameOverResult'>
+                        <h1 class='inline'>city</h1>
+                        <h1 class='inline' id='winnerTeamToWrite'>XXX</h1>
+                        <h1 class='inline'>won with only </h1>
+                        <h1 class='inline' id ='winnerScoreToWrite'>XXX</h1>
+                        <h1 class='inline' >km of unacurracy!</h1>
+                    </div>
+                    <div id='restart'>
+                        <p>restart</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+      <script src="../../Build/Cesium/Cesium.js"></script>
+    <script>
+        var viewer = new Cesium.Viewer('cesiumContainer');
+    </script>
+    </body>
