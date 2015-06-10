@@ -335,7 +335,7 @@ var App={
         currentRound: 0,
         playerTurn: 0,
         whosPlayerTurn:[],
-        numberOfShoots:1,
+        numberOfShoots:3,
         numberOfTargets:3,
 
         /* *************************************
