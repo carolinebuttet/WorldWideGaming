@@ -523,7 +523,7 @@ restart p{
   background-color: rgb(255,121,77);
   box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
   position:absolute;
-  top:50%;
+  top:30%;
   left:40px;
   border-radius: 50%;
   width:50px;
@@ -539,7 +539,7 @@ restart p{
   background-color: rgb(255,121,77);
   box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
   position:absolute;
-  top:50%;
+  top:30%;
   right:40px;
   border-radius: 50%;
   width:50px;
@@ -727,7 +727,7 @@ restart p{
   width:100%;
   height:100%;  
 }
-#zoomPlus{
+.zoomPlus{
   position: absolute;
   top: 20%;
   left: 50%;
@@ -737,7 +737,7 @@ restart p{
   width:100px;
   height:100px;
 }
-#zoomMinus{
+.zoomMinus{
   position: absolute;
   top: 80%;
   left: 50%;
@@ -757,7 +757,7 @@ restart p{
   width:50px;
   height:50px;
 }
-#zoomRestartPlus{
+.zoomRestartPlus{
   position: absolute;
   top: 20%;
   left: 50%;
@@ -767,7 +767,7 @@ restart p{
   width:80px;
   height:80px;
 }
-#zoomRestartMinus{
+.zoomRestartMinus{
   position: absolute;
   top: 80%;
   left: 50%;
@@ -816,7 +816,7 @@ restart p{
 /*HELP SCREEN-----------------------------------------*/
 .helpMobile{
   position:absolute;
-  top:50%;
+  top:30%;
   left:50%;
   transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
