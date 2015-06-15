@@ -353,7 +353,7 @@ var App={
         playerTurn: 0,
         whosPlayerTurn:[],
         numberOfShoots:3,
-        numberOfTargets:2,
+        numberOfTargets:1,
         isMute : false,
         glissendoSound : new Howl({urls: ['data/sounds/mobile_glissendo.mp3']}),
         /* *************************************
