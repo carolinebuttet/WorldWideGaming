@@ -492,7 +492,7 @@ var App={
             //FNU FACTS
             App.$doc.on('click','#nextFunFact', App.Player.onNextFunFact);
             //SOUNDS
-            App.$doc.on('click','.clickable', App.playSoundClickHowl);
+            //App.$doc.on('click','.clickable', App.playSoundClickHowl);
             App.$doc.on('click', '#audioMute', App.toggleSound);
         },
         //-------------------------------------------------------------------
