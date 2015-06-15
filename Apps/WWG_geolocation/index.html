@@ -597,6 +597,15 @@
     }
     </script>
     <script>
+                //RANDOM BACKGROUND
+                var backgroundSrc = ['data/backgroundImgs/b1.jpg','data/backgroundImgs/b2.jpg','data/backgroundImgs/b3.jpg','data/backgroundImgs/b4.jpg','data/backgroundImgs/b5.jpg','data/backgroundImgs/b6.jpg','data/backgroundImgs/b7.jpg','data/backgroundImgs/b8.jpg','data/backgroundImgs/b9.jpg','data/backgroundImgs/b10.jpg','data/backgroundImgs/b11.jpg','data/backgroundImgs/b12.jpg','data/backgroundImgs/b13.jpg','data/backgroundImgs/b14.jpg'];
+                console.log('bakcground image!!!');
+                var randomImg = Math.round(Math.random()*backgroundSrc.length);
+                var src = backgroundSrc[randomImg];
+                console.log('src =' + src);
+                $('.wrapper').css("background", "url("+src+") no-repeat center center fixed"); 
+    </script>
+    <script>
     //this is a script to prevent the menu from appearing in android
     function absorbEvent_(event) {
       var e = event || window.event;

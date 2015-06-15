@@ -374,12 +374,13 @@ var App={
             //--------------------------------------------
              //FUNCTION START SOUND------------------------
             startSoundHowl : function(sound){
-               sound.play();
+               sound.fadeIn(1,200);
             },
             //--------------------------------------------
             //FUNCTION STOP SOUND-------------------------
             stopSoundHowl: function(sound){
-                sound.stop();
+                //sound.stop();
+                sound.fadeOut(0,50,sound.stop());
             },
             //--------------------------------------------
             //FUNCTION PLAY SOUND CLICK--------------------
