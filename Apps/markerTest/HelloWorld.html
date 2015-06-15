@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version (or Chrome Frame if pre-IE11). -->
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Hello World!</title>
+
+  <script src="../../Build/Cesium/Cesium.js"></script>
+  <style>
+      @import url(../../Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+          font-family: Arial;
+      }
+      #cesiumContainer{
+      }
+      .staticMap{
+        display:none;
+        position:absolute;
+        background-color: white;
+        z-index:1;
+        right:20px;
+        bottom:40px;
+        width:300px;
+        height:200px;
+        padding:10px;
+      }
+      .infos{
+        display:none;
+        position:absolute;
+        background-color: white;
+        z-index:2;
+        color: black;
+        font-weight: 30px;
+        margin:10px;
+        padding:10px;
+      }
+      .mapToShow img{
+      }
+      #force, #angle, #elevation, #score{
+        float:right;
+      }
+
+
+  </style>
+</head>
+<body>
+    <div class='infos'>
+     <table>
+      <tr>
+        <td><div if='rotateText'>A/D: rotate:</div></td>
+        <td><div id='angle'></div></td>
+      </tr>
+      <tr>
+        <td><div id='elevationText'>W: lausanne:</div></td>
+        <td><div id='elevation'></div></td>
+      </tr>
+      <tr>
+        <td><div id='forceText'>Q: bruxelles</div></td>
+        <td><div id ='force'></div></td>
+      </tr>
+      <tr>
+        <td>Y : throw!</td>
+      </tr>
+      <tr>
+        <td><div id='scoreText'>  - score</div></td>
+        <td><div id ='score'></div></td>
+      </tr>
+    </table>
+  </div>
+  <div class='staticMap'>
+    <div class='mapToShow'>
+      <img id='staticImg' src='http://dev.virtualearth.net/REST/v1/Imagery/Map/Aerial/46.54, 6.59/15?mapSize=300,200&key=AvRFjXkotEcTdjuZLdPtg2JqWv3yKtMLkBeQnQvQ7nERmEWpdpxqP9itXTf55Yb9'>
+    </div>
+  </div>
+  <div id="cesiumContainer" class="fullSize"></div>
+  <div id="loadingOverlay"><h1>Loading...</h1></div>
+  <div id="toolbar"></div>
+  <script src='mainCesium.js'></script>
+</body>
+</html>

@@ -114,6 +114,23 @@
     <!-- This is the 'Player' screen. Mobile HTML goes here! -->
 
     <script id="player-game-template" type="text/template">
+        <!--- SOUNDS -->
+        <div class='audioMobile'>
+        <audio id='soundClick'>
+            <source src="data/sounds/mobile_click.mp3" type="audio/mp3">
+        </audio>
+        <audio id='soundBack'>
+            <source src="data/sounds/mobile_back.mp3" type="audio/mp3">
+        </audio>
+        <audio id='soundSwoosh'>
+            <source src="data/sounds/swoosh.mp3" type="audio/mp3">
+        </audio>
+        <audio id='soundGlissendo'>
+            <source src="data/sounds/mobile_glissendo.mp3" type="audio/mp3">
+        </audio>
+        </div>
+        <!-- ENF OF SOUNDS-->
+
             <div id='controlsScreenMobile'>
                 <button id='debug' class='clickable'>send debug</button>
             <!--MOBILE CHOOSE ORIENTATION-->
@@ -212,7 +229,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class='logoBoxMobile clickable' id='throwMobile'>
+                    <div class='logoBoxMobile' id='throwMobile'>
                         <img class='circleImg' src="data/orange_circle.png">
                         <img src="data/throw.png">
                     </div>
@@ -302,6 +319,34 @@
                         </div>
                     </div>
                 </div>
+               
+                <!--- MOBILE FUN FACTS -->
+               
+                <div id='funFactsMobile'>
+                    <div class='controlTopBoxMobile'>
+                        <div class='dataDisplayWrapperMobile'>
+                            <div class='dataDisplayMobile'>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='logoBoxMobile'>
+                        <img class='circleImg' src="data/orange_circle.png">
+                        <div id='funFactBottom'>
+                            <div id='funFactTextWrapperBottom'>
+                                <p id='funFactToDisplay'>a fun fact here!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='controlTopBoxMobile'>
+                        <div class='goBack greyed'>
+                            <img src='data/discard.png'>
+                        </div>
+                        <div class='helpMobile greyed'><p>?</p></div>
+                        <div class='changeTurn clickable' id='nextFunFact'>
+                            <img src='data/discard.png'>
+                        </div>
+                    </div>
+                </div>
 
                 <!--MOBILE GAME OVER SCREEN -->
 
@@ -341,6 +386,26 @@
               </div>
             </div>
            <div id="cesiumContainer" class="fullSize"></div>
+           <!-- HOST SOUNDS -->
+            <audio id='soundLoop' loop autoplay>
+                <source src="data/sounds/loop.mp3" type="audio/mp3">
+            </audio>
+            <audio id='soundGood'>
+                <source src="data/sounds/good1.mp3" type="audio/mp3">
+            </audio>
+            <audio id='soundBad'>
+                <source src="data/sounds/bad1.mp3" type="audio/mp3">
+            </audio>
+            <audio id='soundLanding'>
+                <source src="data/sounds/landing1.mp3" type="audio/mp3">
+            </audio>
+            <audio id='soundWind'>
+                <source src="data/sounds/wind.mp3" type="audio/mp3">
+            </audio>
+            <audio id='soundWinner'>
+                <source src="data/sounds/winner.mp3" type="audio/mp3">
+            </audio>
+            <!-- END OF HOST SOUNDS -->
 
            <!--HOST GAME INFOS  -->
 
@@ -355,7 +420,7 @@
                     <div id='player1'>
                         <div class='playerInfos'>
                             <div class='teamName' id='teamNamep1'>
-                                <h2 class='teamNameToWrite'>LAUSANNE </h2>
+                                <h1 class='teamNameToWrite'>LAUSANNE </h1>
                             </div>
                             <div class='score' id='scorep1'>
                                 <h1 class='scoreToWrite'>0</h1>
@@ -381,7 +446,7 @@
                                 <h1 class='scoreToWrite'>0</h1>
                             </div>
                             <div class='teamName' id='teamNamep2'>
-                                <h2 class='teamNameToWrite'>BRUXELLES</h2>
+                                <h1 class='teamNameToWrite'>BRUXELLES</h1>
                             </div>
                         </div>
                     </div>
@@ -394,13 +459,17 @@
                         <h1 id='targetName'>target</h1>
                     </div>
                 </div>
+
+                <div id='audioMute'>
+                    <img id='volIcon' src='data/soundActive.png'>
+                </div>
             </div>
 
              <!--HOST TARGET CHOICE OVERLAY-->
 
             <div class='overlay' id='targetOverlay'>
                 <div class='alertBox' id='newTargetAlert'>
-                    <div><p>A new target is chosen:&nbsp;</p><p id='targetToWrite'>target name</p></div>
+                    <div><p>A new target <br>is chosen:&nbsp;</p><p id='targetToWrite'>target name</p></div>
                 </div>
             </div>
 
@@ -421,7 +490,7 @@
                 <div class='tutorialBottomBox alertBox'>
                     <div id='orientationExplanation'>
                         <h1>Choose orientation!</h1>
-                        <p>Point your phone towards the direction of the target, <br>and validate with<br>a click!</p>
+                        <p>Point your phone towards the direction <br>of the target,and validate<br> with a click!</p>
                     </div>
                 </div>
             </div>
@@ -501,6 +570,7 @@
     <script src="libs/jquery.spritely.js" type="text/javascript"></script>
     <script src="libs/textFit.min.js"></script>
     <script src="libs/fastclick.js"></script>
+    <script src="libs/howler.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="mainCesium3.js"></script>
     <script>

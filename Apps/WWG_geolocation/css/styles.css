@@ -39,6 +39,9 @@ body{
 #gameInfos{
   color:white;
 }
+#gameInfos h1{
+  font-size:2.7em;
+}
 .backgroundChangeColor{
   /*background-color: rgb(255,205,194);*/
 }
@@ -167,7 +170,7 @@ body{
 #player1, #player2{
   background-color: rgba(255,0,0,0.5);
   display:inline-block;
-  width:38%;
+  width:35%;
 }
 #player1{
   position:absolute;
@@ -180,11 +183,11 @@ body{
 
 #scorep1{
   position:absolute;
-  right:20%;
+  right:15%;
 }
 #scorep2{
   position:absolute;
-  left:20%;
+  left:15%;
 }
 .score{
   display:inline-block;
@@ -236,22 +239,22 @@ body{
 }
 
 .point1{
-  width:15px;
-  height:15px;
+  width:10px;
+  height:10px;
   border-radius: 50%;
   display: inline-block;
   box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
 }
 .point2{
-  width:15px;
-  height:15px;
+  width:10px;
+  height:10px;
   border-radius: 50%;
   display: inline-block;
   box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
 }
 .point3{
-  width:15px;
-  height:15px;
+  width:10px;
+  height:10px;
   border-radius: 50%;
   display: inline-block;
   box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
@@ -260,11 +263,17 @@ body{
   display:inline-block;
   position:absolute;
   left: 50%;
-  width:20%
+  width:25%
   text-align:center;
   transform: translateX(-50%);
   -moz-transform: translateX(-50%);
   -webkit-transform: translateX(-50%);
+}
+#audioMute{
+  display:block;
+  position:absolute;
+  right:20px;
+  bottom:20px;
 }
 #targetNameWrapper{
 }
@@ -311,13 +320,26 @@ line-height: 35px;
   box-shadow: 2px 2px 0px rgba(80,107,104,0.2);
 }
 .overlay{
-  position:absolute;
+ /* position:absolute;
   top:75px;
   left:50%;
   transform:translate(-50%,-50%);
   -moz-transform:translate(-50%,-50%);
   -webkit-transform:translate(-50%,-50%);
-  line-height:25px;
+  line-height:25px;*/
+  font-size:3.2em;
+  display:none;
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:450px;
+  height:450px;
+  transform:translate(-50%,-50%);
+  -moz-transform:translate(-50%,-50%);
+  -webkit-transform:translate(-50%,-50%);
+  border-radius: 50%;
+  background-color: rgba(255,121,77,1);
+  box-shadow: 2px 2px 0px rgba(124,125,125,0.5);
 }
 .alertBox{
   color:white;
@@ -326,6 +348,16 @@ line-height: 35px;
 #newScore, #newTargetAlert *{
   display:inline-block;
 }
+
+#newTargetAlert, #newScore{
+  top: 50%;
+    position: absolute;
+    transform: translateY(-50%);
+    -moz-transform:translateY(-50%);
+    -webkit-transform:translateY(-50%);
+    line-height:60px;
+}
+
 /* BROWSER :HELP----------------------*/
 .tutorialOverlay{
   position:absolute;
@@ -337,8 +369,9 @@ line-height: 35px;
   -webkit-transform:translate(-50%,-50%);
   -moz-transform:translate(-50%,-50%);
   border-radius: 50%;
-  background-color: rgba(255,121,77,0.7);
-  /*background-color: rgba(0,212,188,0.7);*/
+  background-color: rgba(255,121,77,1);
+  box-shadow: 2px 2px 0px rgba(124,125,125,0.5);
+  /*background-color: rgba(0,212,188,1);*/
 }
 .tutorialOverlay p{
   margin-top: 10px;
@@ -423,7 +456,7 @@ line-height: 35px;
 #gameOverOverlay{
   display:none;
   position:absolute;
-  background-color: rgba(199,255,249,0.8);
+  /*background-color: rgba(199,255,249,0.8);*/
   top:0px;
   left:0px;
   width: 100%;
@@ -472,6 +505,9 @@ restart p{
 /*END OF BROWSER-------------------------------------------------------------------------------*/
 
 /*NEW STYLESHEET FOR MOBILE---------------------------------------------------------------------*/
+.audioMobile{
+  display:none;
+}
 .wrapperMobile{
   display:block;
   width:100%;
@@ -777,7 +813,40 @@ restart p{
   width:80px;
   height:80px;
 }
+/*FUN FACTS SCREEN -----------------------------------*/
+#funFactsMobile{
+  display:none;
+  width:100%;
+  height:100%;
+  color:white;
+  text-align: center;
+}
 
+#funFactTop p {
+  font-size:1em;
+  line-height:22px;
+  display:inline-block;
+}
+#funFactBottom p {
+  font-size: 1em;
+  line-height:22px;
+  display:inline-block;
+}
+
+#funFafctCityName{
+  display:inline-block;
+  margin:0px;
+  padding:0px;
+}
+#funFactTextWrapperBottom{
+}
+#funFactToDisplay{
+  position:absolute;
+  top:50%;
+  transform:translate(-50%,-50%);
+  -moz-transform:translate(-50%,-50%);
+  -webkit-transform:translate(-50%,-50%);
+}
 /*WAIT SCREEN -----------------------------------*/
 #waitMobileWrapper{
   display:block;

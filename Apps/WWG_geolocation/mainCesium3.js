@@ -35,6 +35,7 @@ var IO = {
             IO.socket.on('chooseColorBlue',IO.onPlayerColorBlue);
             IO.socket.on('displayHelp', IO.onDisplayHelp);
             IO.socket.on('enableChangeTurn', IO.onEnableChangeTurn);
+            IO.socket.on('sendFunFact',IO.onGetFunFact);
             },
         //IO-FUNCTION ON CONNECTION--------------------------------------------
         onConnected : function() {
@@ -144,7 +145,15 @@ var IO = {
                 document.getElementById('forceMobileWrapper').style.display="none";
                 document.getElementById('throwMobileWrapper').style.display="none";
                 document.getElementById('zoomMobileWrapper').style.display="none";
-                document.getElementById('waitMobileWrapper').style.display = "block";
+                document.getElementById('waitMobileWrapper').style.display = "none";
+                document.getElementById('funFactsMobile').style.display = "none";
+                if(!App.Player.isReadyForFunFact){
+                    document.getElementById('waitMobileWrapper').style.display = "block";
+                }else{
+                    document.getElementById('funFactsMobile').style.display = "block";
+                    IO.socket.emit('askFunFact',{gameId:App.gameId, mySocketId:App.mySocketId, currentTarget:App.Player.currentTarget}); 
+                }
+                
         	}
         },
         //-------------------------------------------------------------------
@@ -162,7 +171,15 @@ var IO = {
             }
         },
         //-------------------------------------------------------------------
-        
+       //IO-FUNCTION GET FUN FACT -------------------------------------------
+        onGetFunFact:function(data){
+            console.log('fun fact to display is '+ data.funFactToDisplay);
+            //si je suis palyer et que ça n'est pas mon tour:
+            if(App.myRole==='Player'){
+                App.Player.displayFunFact(data.currentTarget, data.funFactToDisplay);
+            }
+        },
+        //-------------------------------------------------------------------
         //IO-FUNCTION BROWSER JOINED ROOM------------------------------------
         browserJoinedRoom : function(data) {
             console.log('a browser joined!!!');
@@ -336,11 +353,79 @@ var App={
         playerTurn: 0,
         whosPlayerTurn:[],
         numberOfShoots:3,
-        numberOfTargets:3,
-
+        numberOfTargets:2,
+        isMute : false,
+        glissendoSound : new Howl({urls: ['data/sounds/mobile_glissendo.mp3']}),
         /* *************************************
          *                Setup                *
          * *********************************** */
+          // SOUNDS FUNCTIONS-------------------------------------------------
+           //FUNCTION PLAY SOUND CLICK--------------------
+            playSoundClickHowl:function (){
+                console.log('play sound  click howl!!');
+                //$('#soundClick').trigger('play');
+                var sound = new Howl({urls: ['data/sounds/mobile_click.mp3']}).play();
+            },
+            //---------------------------------------------
+            //FUNCTION PLAY SOUND--------------------------
+            playSoundHowl :function(url){
+                var sound = new Howl({urls: [url]}).play();
+            },
+            //--------------------------------------------
+             //FUNCTION START SOUND------------------------
+            startSoundHowl : function(sound){
+               sound.play();
+            },
+            //--------------------------------------------
+            //FUNCTION STOP SOUND-------------------------
+            stopSoundHowl: function(sound){
+                sound.stop();
+            },
+            //--------------------------------------------
+            //FUNCTION PLAY SOUND CLICK--------------------
+            playSoundClick:function (){
+                console.log('play sound  click!');
+                $('#soundClick').trigger('play');
+            },
+            //---------------------------------------------
+            //FUNCTION PLAY SOUND--------------------------
+            playSound :function(idName){
+                console.log('play sound ' + idName);
+                $(idName).trigger('play');
+            },
+            //--------------------------------------------
+            //FUNCTION START SOUND------------------------
+            startSound : function(idName){
+                console.log('start sound ' + idName);
+                $(idName).prop("volume","0");
+                $(idName).trigger('play');
+                $(idName).animate({volume:1},1);
+            },
+            //--------------------------------------------
+            //FUNCTION MUTE SOUND-------------------------
+            toggleSound : function (){
+                App.isMute = !App.isMute
+                if(App.isMute){
+                   $('#soundLoop').trigger('pause'); 
+                   //change src of #volIcon
+                   $('#volIcon').attr('src','data/soundInactive.png'); 
+                }
+                else if(!App.isMute){
+                    $('#soundLoop').trigger('play');
+                    $('#volIcon').attr('src','data/soundActive.png'); 
+                }
+                //
+            },
+            //--------------------------------------------
+            //FUNCTION STOP SOUND-------------------------
+            stopSound: function(idName){
+                console.log('stop sound ' + idName);
+                $(idName).animate({volume:0},100, function(){
+                $(idName).trigger('pause');
+                $(idName).prop("currentTime","0");
+                });
+            },
+            //--------------------------------------------
 
         //APP-FUNCTION INIT--------------------------------------------------
         init: function () {
@@ -403,6 +488,11 @@ var App={
             //new player
             App.$doc.on('click','#welcomeConnectMobile', App.displayConnectionFromMobile);
             App.$doc.on('click','#connectionButtonMobile', App.Player.onPlayerStartClick);
+            //FNU FACTS
+            App.$doc.on('click','#nextFunFact', App.Player.onNextFunFact);
+            //SOUNDS
+            App.$doc.on('click','.clickable', App.playSoundClickHowl);
+            App.$doc.on('click', '#audioMute', App.toggleSound);
         },
         //-------------------------------------------------------------------
         
@@ -665,6 +755,8 @@ var App={
         
             //APP-HOST-FUNCTION ENDGAME--------------------------------------
             endGame : function(data) {
+                //STOP THE MAIN MUSIC
+                App.stopSound('#soundLoop');
                console.log('Game is over for HOST');
                 var $p1 = $('#player1');
                 var p1Score = +$p1.find('.scoreToWrite').text();
@@ -682,7 +774,7 @@ var App={
                     }else if(App.Host.playersWithPositions[0].teamColor==='red'){
                         console.log('p1 won with color red');
                         $('#gameOverHostImg').attr('src','data/newLogo/game_over_orange.png'); 
-                        $('#gameOverOverlay').css( "background-color", "rgba(255,121,77,0.6)");
+                        //$('#gameOverOverlay').css( "background-color", "rgba(255,121,77,0.6)");
                         $('#gameOverResult').css( "background-color", "rgb(255,121,77)");
                         $('#restart').css( "background-color", "rgb(255,121,77)");
                     } 
@@ -694,7 +786,7 @@ var App={
                     }else if(App.Host.playersWithPositions[1].teamColor==='red'){
                         console.log('p2 won with color red');
                         $('#gameOverHostImg').attr('src','data/newLogo/game_over_orange.png');
-                        $('#gameOverOverlay').css( "background-color", "rgba(255,121,77,0.6)"); 
+                        //$('#gameOverOverlay').css( "background-color", "rgba(255,121,77,0.6)"); 
                         $('#gameOverResult').css( "background-color", "rgb(255,121,77)");
                         $('#restart').css( "background-color", "rgb(255,121,77)");  
                     } 
@@ -704,6 +796,8 @@ var App={
                 document.getElementById('gameOverOverlay').style.display = "block";
                 App.Host.numPlayersInRoom = 0;
                 App.Host.isNewGame = true;
+                //SOUND
+                App.playSound('#soundWinner');
             },
             //-------------------------------------------------------------------
         
@@ -720,7 +814,8 @@ var App={
                 console.log('color of player active is ' + App.Host.playersWithPositions[App.playerTurn].teamColor);
                 if(App.Host.playersWithPositions[App.playerTurn].teamColor ==='red'){
                     console.log('red!');
-                    $('.tutorialOverlay').css( "background-color", "rgba(255,121,77,0.7)");
+                    $('.tutorialOverlay').css( "background-color", "rgba(255,121,77,1)");
+                    $('.overlay').css( "background-color", "rgba(255,121,77,1)");
                     //$("body").css( "background-color", "rgb(255,205,194)");
                     //$('#gameAreaHost').css("border-color", "rgb(255,76,35)");
                     //$("#targetName").css( "background-color", "rgb(255,76,35)");
@@ -730,7 +825,8 @@ var App={
 
                 }else if(App.Host.playersWithPositions[App.playerTurn].teamColor==='blue'){
                     console.log('blue!');
-                    $('.tutorialOverlay').css( "background-color", "rgba(0,212,188,0.7)");
+                    $('.tutorialOverlay').css( "background-color", "rgba(0,212,188,1)");
+                    $('.overlay').css( "background-color", "rgba(0,212,188,1)");
                     //$("body").css( "background-color", "rgb(237,253,252)");
                     //$('#gameAreaHost').css("border-color", "rgb(0,212,188)");
                     //$("#targetName").css( "background-color", "rgb(0,212,188)");
@@ -774,11 +870,11 @@ var App={
                 //COLORS OF GLOBE
                 var imageryLayers = viewer.imageryLayers;
                 var layer = imageryLayers.get(0);
-                layer.brightness= 1.26;
-                layer.contrast= 0.98;
+                layer.brightness= 1.38;//1.26;
+                layer.contrast= 1.18;//0.98;
                 layer.hue= 0;
-                layer.saturation=1.7;
-                layer.gamma= 1.62;
+                layer.saturation=1.48; //1.7;
+                layer.gamma=1.1; //1.02;//1.62;
                 //
                 var scene = viewer.scene;
                 var clock = viewer.clock;
@@ -805,6 +901,7 @@ var App={
                 var shootCount=0;
                 var targetCount=-1;
                 var isFlying=false;
+                var isFlyingWithNoDelay=false;
                 var canvas = viewer.canvas;
                 canvas.setAttribute('tabindex', '0'); // needed to put focus on the canvas
                 var ellipsoid = viewer.scene.globe.ellipsoid;
@@ -843,6 +940,7 @@ var App={
                 var start = Cesium.JulianDate.now();
                 var stop = Cesium.JulianDate.addHours(start, 1, new Cesium.JulianDate()); 
                 var publicArrivalTime = new Cesium.JulianDate();
+                var publicArrivalTimeWithDelay = new Cesium.JulianDate();
                 var waitingSecondsOnTarget=2;
                 //Make sure viewer is at the desired time.
                 viewer.clock.startTime = start.clone();
@@ -893,18 +991,19 @@ var App={
                         orientation : new Cesium.VelocityOrientationProperty(computedPositions),
                         //Load the Cesium plane model to represent the entity
                         model : {
-                            uri : 'test.gltf',
+                            uri : 'test_old.gltf',
                             minimumPixelSize : 24,
                             size:0.8,
                         },
                         //Show the path as a yellow line sampled in .2 second increments.
                         path : {
                             resolution : 0.2,
-                            material : new Cesium.PolylineGlowMaterialProperty({
-                                glowPower : 0.1,
+                            material:color,
+                            /*material : new Cesium.PolylineGlowMaterialProperty({
+                                glowPower : 0.5,
                                 color : color
-                            }),
-                            width : 5
+                            }),*/
+                            width : 2
                         }
                     });
                     entity.position.setInterpolationOptions({
@@ -983,7 +1082,7 @@ var App={
                     polylineElevation = polylines.add({
                     positions : ellipsoid.cartographicArrayToCartesianArray(positionsElevation),
                     material : Cesium.Material.fromType('Color', {
-                        color : new Cesium.Color(1.0, 1.0, 1.0, 1.0)
+                        color : Cesium.Color.WHITE
                         })
                     });
 
@@ -998,7 +1097,7 @@ var App={
                     polylineOrientation = polylines.add({
                     positions : ellipsoid.cartographicArrayToCartesianArray(positionsOrientation),
                     material : Cesium.Material.fromType('Color', {
-                        color : new Cesium.Color(0, 0, 1.0, 1.0)
+                        color : Cesium.Color.WHITE
                         })
                     });
                 }
@@ -1050,11 +1149,29 @@ var App={
                     if(App.Host.throwGo===true){
                         throwBullet();
                         isFlying=true;
+                        isFlyingWithNoDelay=true;
                         console.log('flying.....');
                         App.Host.throwGo = false;
                     }
                     //Set the camera with boundingsphere and entity view! (https://groups.google.com/forum/#!msg/cesium-dev/ES4tnBr7mx8/mUknrw00BVYJ + https://cesiumjs.org/Cesium/Build/Documentation/EntityView.html)
-                    if(isFlying && Cesium.JulianDate.greaterThanOrEquals(viewer.clock.currentTime, publicArrivalTime)===true){
+                    if(isFlying && isFlyingWithNoDelay && Cesium.JulianDate.greaterThanOrEquals(viewer.clock.currentTime, publicArrivalTime)===true){
+                        //SOUND
+                        App.stopSound('#soundWind');
+                        App.playSound('#soundLanding');
+                        isFlyingWithNoDelay=false;
+                    }
+                    else if(!isFlyingWithNoDelay && isFlying && Cesium.JulianDate.greaterThanOrEquals(viewer.clock.currentTime, publicArrivalTimeWithDelay)===true){
+                        //SOUND GOOD OR BAD HERE
+                        if(scoreToSend>500){
+                            console.log('you suck');
+                            App.playSound('#soundBad');
+                        }
+                        else if(scoreToSend<50){
+                            console.log('very good !');
+                            App.playSound('#soundGood');
+
+                        }
+
                         console.log('has arrived, lets send the socket');
                         console.log('app.game id = ' + App.gameId);
                         IO.socket.emit('ball_has_arrived', {gameId:App.gameId, mySocketId:App.whosPlayerTurn, 'hasArrived':'hasArrived'});
@@ -1070,18 +1187,18 @@ var App={
                     //ZOOM WHILE FLYING
                     else if(isFlying && App.Host.isBackward && cameraHeight < cameraMaxheight){
                         camera.moveBackward(moveRate);
-                        console.log('camera height = ' + cameraHeight +' VS '+ cameraMinHeightWhileFlying);
+                        //console.log('camera height = ' + cameraHeight +' VS '+ cameraMinHeightWhileFlying);
                     }else if(isFlying && App.Host.isForward && cameraHeight>cameraMinHeightWhileFlying){
                         camera.moveForward(moveRate);
-                        console.log('camera height = ' + cameraHeight +' VS '+ cameraMinHeightWhileFlying);
+                        //console.log('camera height = ' + cameraHeight +' VS '+ cameraMinHeightWhileFlying);
                     }
                     //ZOOM WHILE LANDED
                     else if(!isFlying && App.Host.isBackward && cameraHeight < cameraMaxheight){
                         camera.moveBackward(moveRate);
-                        console.log('camera height = ' + cameraHeight);
+                        //console.log('camera height = ' + cameraHeight);
                     }else if(!isFlying && App.Host.isForward && cameraHeight> arrivalAltitude+500){
                         camera.moveForward(moveRate);
-                        console.log('camera height = ' + cameraHeight);
+                        //console.log('camera height = ' + cameraHeight);
                     }
                 });
                 /////----------------------------------------------
@@ -1130,6 +1247,8 @@ var App={
                 ///CESIUM FUNCTION THROW BULLET---------------------------
                 function throwBullet(){
                     console.log('THRW IT!!!');
+                    //SOUND
+                    App.startSound('#soundWind');
                     if(App.Host.force>0 && App.Host.elevation>0){
                         interpolatePath(playerPosition, App.Host.playerLat, App.Host.playerLng, App.Host.force, App.Host.elevation, App.Host.angle); console.log('THROW!!!!!!!!');
                     }
@@ -1320,7 +1439,8 @@ var App={
                     var halfWayPosition = rotated;
                     property.addSample(halfWayTime, halfWayPosition);
                     var arrivalTime = Cesium.JulianDate.addSeconds(viewer.clock.currentTime, timeArrival, new Cesium.JulianDate());
-                    publicArrivalTime = Cesium.JulianDate.addSeconds(viewer.clock.currentTime, timeArrival+waitingSecondsOnTarget, new Cesium.JulianDate());;
+                    publicArrivalTime = Cesium.JulianDate.addSeconds(viewer.clock.currentTime, timeArrival+0, new Cesium.JulianDate());
+                    publicArrivalTimeWithDelay = Cesium.JulianDate.addSeconds(viewer.clock.currentTime, timeArrival+waitingSecondsOnTarget, new Cesium.JulianDate());
                     console.log('public arrival time ==== ' + publicArrivalTime);
                     var arrivalPosition = arrivalRotated;
                     ///GET THE STATIC MAP
@@ -1375,6 +1495,7 @@ var App={
             hostSocketId: '',
             myName: '',
             isRed:true,
+            isReadyForFunFact:false,
             teamColor:'',
             isMyTurn:'',
             isGameOver:false,
@@ -1409,12 +1530,13 @@ var App={
             forceMultiplyFactorVol:1.5,
             forceMultiplyFactorShake:4,
             forceMultiplyFactorTouch:1,
-            isNeedingSound:false,
             isGeolocated:false,
             round:'',
             score:'',
             shouldCount:'false',
-            
+            currentTarget:'',
+
+            //-------------------------------------------------------------------
             onJoinClick: function () {
                 console.log('Join game!!!');
                 App.$gameArea.html(App.$templateJoinGame);
@@ -1459,7 +1581,20 @@ var App={
                 }
             },
             //-------------------------------------------------------------------
-        
+            //APP-PLAYER_FUNCTION NEXT FUN FACT----------------------------------
+            onNextFunFact : function(){
+                console.log('next fun fact here!');
+                IO.socket.emit('askFunFact',{gameId:App.gameId, mySocketId:App.mySocketId, currentTarget:App.Player.currentTarget}); 
+            },
+            //-------------------------------------------------------------------
+                        
+            //APP-PLAYER_FUNCTION DISPLAY FUN FACT---------------------------------
+            displayFunFact: function(targetName, funFact){
+                console.log('display fun fact :' + targetName + 'fun fact = ' + funFact);
+                $('#funFactToDisplay').text(funFact);
+            },
+            //-------------------------------------------------------------------
+
             //APP-PLAYER-FUNCTION ASK HELP---------------------------------------
             askHelp:function(){
                 console.log('someone asked for help, send a socket!');
@@ -1497,7 +1632,8 @@ var App={
         
             //APP-PLAYER-FUNCTION ALERT TARGET-----------------------------------
             alertTarget:function(data){
-                alert('A new target is chosen: '+ data.targetName);
+                alert('A new target is chosen: '+ data.targetName); 
+                App.Player.currentTarget = data.targetName;
             },
             //-------------------------------------------------------------------
         
@@ -1668,8 +1804,12 @@ var App={
                             /*shakeForce.innerHTML =App.Player.higherForce;*/
                             var distanceInKm= App.Player.getCurveCustom(App.Player.higherForce,App.Player.betaSent,0);
                             if(allForcesToUse>90){
+                                ////SOUND
+                                //App.startSound('#soundSwoosh');
+                                //App.playSound('#soundSwoosh');
+                                App.playSoundHowl('data/sounds/swoosh.mp3');
+                                console.log('play swoosh!!');
                                 App.Player.goThrow();
-                                console.log('throw it!!!!');
                             }
                         }
                         var roundedAlpha = Math.round(App.Player.alphaToUse);
@@ -1687,7 +1827,13 @@ var App={
                 App.Player.clickCount++;
                 console.log(App.Player.clickCount);
                 if(App.Player.clickCount==0){
-                document.getElementById('waitMobileWrapper').style.display = "block";
+                    if(!App.Player.isReadyForFunFact){
+                        document.getElementById('waitMobileWrapper').style.display = "block";
+                        document.getElementById('funFactsMobile').style.display = "none";
+                    }else{
+                        document.getElementById('funFactsMobile').style.display = "block";
+                        document.getElementById('waitMobileWrapper').style.display = "none";
+                    }
                 document.getElementById('orientationMobileWrapper').style.display = "none";
                 document.getElementById('azimuthMobileWrapper').style.display = "none";
                 document.getElementById('forceMobileWrapper').style.display = "none";
@@ -1698,6 +1844,9 @@ var App={
                 document.getElementById('enableChangeTurnWrapper').style.display='none';
                 }
                 if(App.Player.clickCount==1){
+                //we can enable the fun fact now.
+                App.Player.isReadyForFunFact=true;
+
                 document.getElementById('waitMobileWrapper').style.display = "none";
                 document.getElementById('orientationMobileWrapper').style.display = "block";
                 document.getElementById('azimuthMobileWrapper').style.display = "none";
@@ -1706,6 +1855,7 @@ var App={
                 document.getElementById('dataContainerMotion').style.display = "none";
                 document.getElementById('zoomMobileWrapper').style.display = "none";
                 document.getElementById('enableChangeTurnWrapper').style.display='none';
+                document.getElementById('funFactsMobile').style.display = "none";
                 }
                 if(App.Player.clickCount==2){
                 document.getElementById('waitMobileWrapper').style.display = "none";
@@ -1716,6 +1866,7 @@ var App={
                 document.getElementById('dataContainerMotion').style.display = "none";
                 document.getElementById('zoomMobileWrapper').style.display = "none";
                 document.getElementById('enableChangeTurnWrapper').style.display='none';
+                document.getElementById('funFactsMobile').style.display = "none";
                 }
                 if(App.Player.clickCount==3){
                 App.Player.forceChoice=3;
@@ -1727,6 +1878,7 @@ var App={
                 document.getElementById('dataContainerMotion').style.display = "none";
                 document.getElementById('zoomMobileWrapper').style.display = "none";
                 document.getElementById('enableChangeTurnWrapper').style.display='none';
+                document.getElementById('funFactsMobile').style.display = "none";
                 }
                 if(App.Player.clickCount==4){
                 document.getElementById('waitMobileWrapper').style.display = "none";
@@ -1738,6 +1890,7 @@ var App={
                 document.getElementById('dataContainerMotion').style.display = "none";
                 document.getElementById('zoomMobileWrapper').style.display = "none";
                 document.getElementById('enableChangeTurnWrapper').style.display='none';
+                document.getElementById('funFactsMobile').style.display = "none";
                 //display throw infos
                 document.getElementById("orientationMobileResume").innerHTML = App.Player.alphaForResume;
                 document.getElementById("elevationMobileResume").innerHTML = App.Player.betaForResume;
@@ -1756,6 +1909,7 @@ var App={
                 document.getElementById('dataContainerOrientation').style.display = "none";
                 document.getElementById('dataContainerMotion').style.display = "none";
                 document.getElementById('zoomMobileWrapper').style.display = "none";
+                document.getElementById('funFactsMobile').style.display = "none";
                 }if(App.Player.clickCount==7){
                 //display wait
                 App.Player.clickCount=0;
@@ -1770,6 +1924,7 @@ var App={
                 document.getElementById('dataContainerMotion').style.display = "none";
                 document.getElementById('zoomMobileWrapper').style.display = "none";
                 document.getElementById('enableChangeTurnWrapper').style.display='none';
+                document.getElementById('funFactsMobile').style.display = "none";
                 }
             },
             //-------------------------------------------------------------------
@@ -1790,6 +1945,9 @@ var App={
         
             //APP-PLAYER-FUNCTION START COUNTING FORCE---------------------------
             startCountingForce: function(){
+                //SOUND
+                //App.startSound('#soundGlissendo');
+                App.startSoundHowl(App.glissendoSound);
                 App.Player.isButtonForcePressed=true;
                 App.Player.precisionForce=0;
                 App.Player.shouldCount=true;
@@ -1825,6 +1983,8 @@ var App={
 
             //APP-PLAYER-FUNCTION STOP PRECISION FORCE COUNT--------------------------
             stopCountingForce:function(){
+                //App.stopSound('#soundGlissendo');
+                App.stopSoundHowl(App.glissendoSound);
                 console.log('function stop counting force');
                 var force = document.getElementById('force');
                 App.Player.isButtonForcePressed=false;    
@@ -1918,6 +2078,7 @@ var App={
                     document.getElementById('forceMobileWrapper').style.display = "none";
                     document.getElementById('throwMobileWrapper').style.display = "none";
                     document.getElementById('zoomMobileWrapper').style.display = "block";
+                    document.getElementById('funFactsMobile').style.display = "none";
                 } else if(App.Player.isFlying===false){
                     console.log('not flying');
                     App.Player.clickCount=5;
