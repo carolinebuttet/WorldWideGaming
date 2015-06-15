@@ -1162,13 +1162,23 @@ var App={
                     }
                     else if(!isFlyingWithNoDelay && isFlying && Cesium.JulianDate.greaterThanOrEquals(viewer.clock.currentTime, publicArrivalTimeWithDelay)===true){
                         //SOUND GOOD OR BAD HERE
-                        if(scoreToSend>500){
+                        if(scoreToSend>=800){
                             console.log('you suck');
-                            App.playSound('#soundBad');
+                            App.playSound('#soundBad2');
                         }
-                        else if(scoreToSend<50){
+                        if(scoreToSend>500 && scoreToSend<800){
+                            App.playSound('#soundBad1');
+                        }
+                        else if(scoreToSend<200&& scoreToSend>50){
+                            var soundsToChoose = ['#soundGood1','#soundGood2','#soundGood3','#soundGood4','#soundGood5'];
+                            var randomSound = Math.round(Math.random()*soundsToChoose.length);
+                            console.log('good!');
+                            console.log(soundsToChoose[randomSound])
+                            App.playSound(soundsToChoose[randomSound]);
+                        }
+                        else if(scoreToSend<=50){
                             console.log('very good !');
-                            App.playSound('#soundGood');
+                            App.playSound('#soundVeryGood');
 
                         }
 
