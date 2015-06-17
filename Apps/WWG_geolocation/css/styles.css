@@ -66,6 +66,7 @@ body{
   -moz-transform:translate(-50%,-50%);
 }
 .button{
+  cursor: pointer;
   background-color: rgb(0,212,188);
   width:285px;
   height:52px;

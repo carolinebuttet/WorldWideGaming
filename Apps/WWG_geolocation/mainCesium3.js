@@ -1004,7 +1004,7 @@ var App={
                                 glowPower : 0.5,
                                 color : color
                             }),*/
-                            width : 2
+                            width : 4
                         }
                     });
                     entity.position.setInterpolationOptions({
@@ -1073,7 +1073,7 @@ var App={
                         console.log('we should remove former lines!');
                         polylines.removeAll();
                     positionElevation1 = Cesium.Cartographic.fromDegrees(lng, lat);
-                    positionElevation2 = Cesium.Cartographic.fromDegrees(lng, lat+.2);
+                    positionElevation2 = Cesium.Cartographic.fromDegrees(lng, lat+.3);
 
                     positionElevationCartesian1 = ellipsoid.cartographicToCartesian(positionElevation1);
                     positionElevationCartesian2 = ellipsoid.cartographicToCartesian(positionElevation2);
@@ -1081,6 +1081,7 @@ var App={
                     polylineLength = Cesium.Cartesian3.distance(positionElevationCartesian1, positionElevationCartesian2)/1000;
                     positionsElevation = [positionElevation1, positionElevation2];
                     polylineElevation = polylines.add({
+                    width:4,
                     positions : ellipsoid.cartographicArrayToCartesianArray(positionsElevation),
                     material : Cesium.Material.fromType('Color', {
                         color : Cesium.Color.WHITE
@@ -1096,6 +1097,7 @@ var App={
                     polylineLengthOrientation = Cesium.Cartesian3.distance(positionOrientationCartesian1, positionOrientationCartesian2)/1000;
                     positionsOrientation = [positionOrientation1, positionOrientation2];
                     polylineOrientation = polylines.add({
+                    width:4,
                     positions : ellipsoid.cartographicArrayToCartesianArray(positionsOrientation),
                     material : Cesium.Material.fromType('Color', {
                         color : Cesium.Color.WHITE
@@ -1241,6 +1243,9 @@ var App={
 		            setReferenceFrame(App.Host.playerLat, App.Host.playerLng,true);
 		            //makeOriginPoint(playerPosition, new Cesium.Color.RED());
 		            //makeOriginPointTarget(targetPosition, targetColor);
+                    //underline the team that is playing
+                    $('#' + App.Host.playersWithPositions[1-App.playerTurn].mySocketId).find('.teamName').css("text-decoration","none");
+                    $('#' + App.Host.playersWithPositions[App.playerTurn].mySocketId).find('.teamName').css("text-decoration","underline");
                 }
                 //-------------------------------------------------
                 ///CESIUM FUNCTION UPDATE ORIENTATION-----------------------
@@ -1523,7 +1528,6 @@ var App={
             alphaForResume:0,
             betaForResume:0,
             forceForResume:0,
-            alphaMobileSmoothOld:0,
             betaMobileSmoothOld:0,
             betaSent:0,
             volumeToUse:0,
@@ -1546,7 +1550,7 @@ var App={
             score:'',
             shouldCount:'false',
             currentTarget:'',
-
+            compass:'',
             //-------------------------------------------------------------------
             onJoinClick: function () {
                 console.log('Join game!!!');
@@ -1707,33 +1711,70 @@ var App={
                 $('.goBack').css( "background-color", "rgb(0,212,188)");
                 $('.changeTurn').css( "background-color", "rgb(0,212,188)");
             }
+            App.Player.compass = document.getElementById('compass')
             var dataContainerOrientation = document.getElementById('dataContainerOrientation');
             var dataContainerMotion = document.getElementById('dataContainerMotion');
-            var compass = document.getElementById('compass');
+            //var compass = document.getElementById('compass');
             var elevation = document.getElementById('elevationImg');
             var angleToDisplay = document.getElementById('angleToDisplay');
             var angle = document.getElementById('angle');
             var force = document.getElementById('force');
-            /*var shakeForce = document.getElementById('shakeForce');*/
+            var oldAlpha=0;
+            var smoothedAlpha=0;
+            var alpha=0;
             if(window.DeviceOrientationEvent && App.Player.isFlying===false) {
+
                 window.addEventListener('deviceorientation', function(event) {
                     var dir ='';
-                    var alpha;
                     if(event.webkitCompassHeading) {
                     alpha = Math.abs(event.webkitCompassHeading-360);
                     App.Player.isIphone = true;
-                    //alpha = event.webkitCompassHeading*-1;
                     }
                     else alpha = event.alpha;
                     var beta = event.beta;
                     var gamma = event.gamma;
-                    App.Player.alphaToUse = alpha;
+                    
                     App.Player.betaToUse=beta;
-                var roundedBeta = Math.round(App.Player.betaToUse);
-                if(alpha!=null || beta!=null || gamma!=null) 
-                dataContainerOrientation.innerHTML = '<strong>Orientation</strong><br />alpha: ' + alpha + '<br/>beta: ' + beta + '<br />gamma: ' + gamma;
-                }, false);
+                    var roundedBeta = Math.round(App.Player.betaToUse);
+                //ORIENTATION
+                if(App.Player.clickCount===1){  
+                smoothedAlpha = alpha; 
+                App.Player.alphaToUse = smoothedAlpha;                 
                 }
+                /*
+                  App.Player.alphaForResume = Math.round(smoothedAlpha);
+                  compass.style.Transform = 'translate(-50%,-50%) rotate( ' + smoothedAlpha + 'deg)';
+                  compass.style.WebkitTransform = 'translate(-50%,-50%) rotate( '+ smoothedAlpha + 'deg)';
+                  compass.style.MozTransform = 'translate(-50%,-50%) rotate(' + smoothedAlpha + 'deg)';
+                  IO.socket.emit('send_data_angle',{gameId:App.gameId, mySocketId:App.mySocketId, alpha: smoothedAlpha});
+                  var roundedAlpha = Math.round(App.Player.alphaToUse);
+                  angleToDisplay.innerHTML = roundedAlpha;
+                  //oldAlpha=smoothedAlpha;
+                }*/
+                
+                //ELEVATION       
+                else if(App.Player.clickCount===2 && App.Player.betaToUse>=0 && App.Player.betaToUse<=90){
+                  var smoothedBeta = App.Player.smoothValueMobile(App.Player.betaMobileSmoothOld, App.Player.betaToUse, 0.1);
+                  IO.socket.emit('send_data_elevation',{gameId:App.gameId, mySocketId:App.mySocketId, beta:smoothedBeta});
+                  App.Player.betaSent = smoothedBeta;
+                  App.Player.betaForResume = Math.round(smoothedBeta);
+                   if(smoothedBeta<=90){
+                    elevation.style.WebkitTransform = 'translate(-50%,-50%) rotate(' + smoothedBeta*-1 +'deg)';
+                    elevation.style.Transform = 'translate(-50%,-50%) rotate(' + smoothedBeta*-1 +'deg)';
+                    elevation.style.MozTransform ='translate(-50%,-50%) rotate(' + smoothedBeta*-1 +'deg)';
+                    }
+                    if(Math.round(smoothedBeta)<=90){
+                    angle.innerHTML = Math.round(smoothedBeta);
+                    }else if(Math.round(smoothedBeta)>90){
+                    angle.innerHTML = '90';
+                    }
+                  //set the old smooth
+                  App.Player.betaMobileSmoothOld = smoothedBeta;
+                }
+                });
+                
+            }
+            
             if(window.DeviceMotionEvent && App.Player.isFlying===false) {
             window.addEventListener('devicemotion', function(event) {
                         var x;
@@ -1754,61 +1795,9 @@ var App={
                         html += 'x: ' + x +'<br />y: ' + y + '<br/>z: ' + z+ '<br />';
                         html += '<strong>Rotation rate</strong><br />';
                         if(r!=null) html += 'alpha: ' + r.alpha +'<br />beta: ' + r.beta + '<br/>gamma: ' + r.gamma + '<br />';
-                            App.Player.absAlpha = r.alpha;
-                        if(App.Player.clickCount ===0){
-                        }else if(App.Player.clickCount===1){
-                            //SMOOTH HERE!
-                        
-                        if(Math.abs(App.Player.alphaMobileSmoothOld - App.Player.alphaToUse)<300){
-                        //si on ne fait pas un tour complet!
-                          var smoothedAlpha = App.Player.smoothValueMobile(App.Player.alphaMobileSmoothOld, App.Player.alphaToUse, 0.1);
-                            }
-                            else{
-                        smoothedAlpha = App.Player.alphaToUse;
-                            }
-                          
-                          //IO.socket.emit('send_data_angle',{gameId:App.gameId, mySocketId:App.mySocketId, alpha: App.Player.alphaToUse});
-                          App.Player.alphaForResume = Math.round(smoothedAlpha);
-                          //
-                        //SMOOTH TEST
-                        /*
-                        var dtheta = joint.targetAngle - joint.angle;
-                        if (dtheta > Math.PI) joint.angle += 2*Math.PI;
-                        else if (dtheta < -Math.PI) joint.angle -= 2*Math.PI;
-                        joint.angle += ( joint.targetAngle - joint.angle ) * joint.easing;
-                        */
-                        //var smoothedAlpha = (App.Player.alphaToUse - App.Player.alphaMobileSmoothOld)*0.1;
-                        //var smoothedAlpha = App.Player.smoothValueMobile(App.Player.alphaMobileSmoothOld, App.Player.alphaToUse, 0.1);
-                          //////////////
-                          compass.style.Transform = 'translate(-50%,-50%) rotate( ' + smoothedAlpha + 'deg)';
-                          compass.style.WebkitTransform = 'translate(-50%,-50%) rotate( '+ smoothedAlpha + 'deg)';
-                          compass.style.MozTransform = 'translate(-50%,-50%) rotate(' + smoothedAlpha + 'deg)';
-                          IO.socket.emit('send_data_angle',{gameId:App.gameId, mySocketId:App.mySocketId, alpha: smoothedAlpha});
-                            //set the old smooth
-                          App.Player.alphaMobileSmoothOld = smoothedAlpha;
-                        }
-                        else if(App.Player.clickCount===2 && App.Player.betaToUse>=0 && App.Player.betaToUse<=90){
-                            //SMOOTH HERE!
-                          var smoothedBeta = App.Player.smoothValueMobile(App.Player.betaMobileSmoothOld, App.Player.betaToUse, 0.1);
-                          //IO.socket.emit('send_data_elevation',{gameId:App.gameId, mySocketId:App.mySocketId, beta:App.Player.betaToUse});
-                          IO.socket.emit('send_data_elevation',{gameId:App.gameId, mySocketId:App.mySocketId, beta:smoothedBeta});
-                          App.Player.betaSent = smoothedBeta;
-                          App.Player.betaForResume = Math.round(smoothedBeta);
-                          //
-                           if(smoothedBeta<=90){
-                            elevation.style.WebkitTransform = 'translate(-50%,-50%) rotate(' + smoothedBeta*-1 +'deg)';
-                            elevation.style.Transform = 'translate(-50%,-50%) rotate(' + smoothedBeta*-1 +'deg)';
-                            elevation.style.MozTransform ='translate(-50%,-50%) rotate(' + smoothedBeta*-1 +'deg)';
-                            }
-                            if(Math.round(smoothedBeta)<=90){
-                            angle.innerHTML = Math.round(smoothedBeta);
-                            }else if(Math.round(smoothedBeta)>90){
-                            angle.innerHTML = '90';
-                            }
-                          //set the old smooth
-                          App.Player.betaMobileSmoothOld = smoothedBeta;
-                        }
-                        else if(App.Player.clickCount===4 ){
+                        App.Player.absAlpha = r.alpha;
+                        //FORCE
+                        if(App.Player.clickCount===4 ){
                             App.Player.allForces = Math.abs(x) + Math.abs(y)+ Math.abs(z)*App.Player.forceMultiplyFactorShake;
                             var allForcesToUse = Math.round(App.Player.allForces);
                             if(App.Player.allForces>App.Player.higherForce){App.Player.higherForce=App.Player.allForces};
@@ -1823,14 +1812,23 @@ var App={
                                 App.Player.goThrow();
                             }
                         }
-                        var roundedAlpha = Math.round(App.Player.alphaToUse);
-                        angleToDisplay.innerHTML = roundedAlpha;
                         dataContainerMotion.innerHTML = html; 
                         });
                 }
             },
             //-------------------------------------------------------------------
-        
+            //APP-PLAYER UPDATE--------------------------------------------------
+            update:function() {
+                if(App.Player.clickCount===1){
+                    App.Player.compass.style.Transform = 'translate(-50%,-50%) rotate( ' + App.Player.alphaToUse + 'deg)';
+                    App.Player.compass.style.WebkitTransform = 'translate(-50%,-50%) rotate( '+ App.Player.alphaToUse + 'deg)';
+                    App.Player.compass.style.MozTransform = 'translate(-50%,-50%) rotate(' + App.Player.alphaToUse + 'deg)';
+                    angleToDisplay.innerHTML = Math.round(App.Player.alphaToUse);
+                    IO.socket.emit('send_data_angle',{gameId:App.gameId, mySocketId:App.mySocketId, alpha: App.Player.alphaToUse});
+                    requestAnimationFrame(App.Player.update);
+                }
+            },
+            
             //APP-PLAYER-FUNCTION CUSTOM CLICK-----------------------------------
 
             customClick: function(){
@@ -1857,6 +1855,8 @@ var App={
                 if(App.Player.clickCount==1){
                 //we can enable the fun fact now.
                 App.Player.isReadyForFunFact=true;
+                //animate arrow
+                requestAnimationFrame(App.Player.update);
 
                 document.getElementById('waitMobileWrapper').style.display = "none";
                 document.getElementById('orientationMobileWrapper').style.display = "block";
