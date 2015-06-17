@@ -472,7 +472,8 @@ var App={
             //App.$doc.on('click','#enableChangeTurnWrapper', App.Player.customClick);
             App.$doc.on('click','#zoomRestart, #helpZoomFly', App.Player.customClick);
             //App.$doc.on('click', '#shake', App.Player.displayShake);
-            App.$doc.on('click', '#precision', App.Player.displayPrecision);
+            //App.$doc.on('click', '#precision', App.Player.displayPrecision);
+            App.$doc.on('click', '#forceImg', App.Player.displayPrecision);
             App.$doc.on('touchstart' ,'.zoomRestartPlus', App.Player.zoomIn);
             App.$doc.on('touchend','.zoomRestartPlus', App.Player.stopZoomIn);
             App.$doc.on('touchstart','.zoomRestartMinus', App.Player.zoomOut);
@@ -1661,6 +1662,7 @@ var App={
                 document.getElementById('throwMobileWrapper').style.display = "none";
                 document.getElementById('zoomMobileWrapper').style.display = "none";
                 document.getElementById('waitMobileWrapper').style.display = "none";
+                document.getElementById('funFactsMobile').style.display = "none";
                 document.getElementById('gameOverMobile').style.display = "block";
             },
             //-------------------------------------------------------------------
@@ -1824,6 +1826,7 @@ var App={
                     App.Player.compass.style.WebkitTransform = 'translate(-50%,-50%) rotate( '+ App.Player.alphaToUse + 'deg)';
                     App.Player.compass.style.MozTransform = 'translate(-50%,-50%) rotate(' + App.Player.alphaToUse + 'deg)';
                     angleToDisplay.innerHTML = Math.round(App.Player.alphaToUse);
+                    App.Player.alphaForResume = Math.round(App.Player.alphaToUse);
                     IO.socket.emit('send_data_angle',{gameId:App.gameId, mySocketId:App.mySocketId, alpha: App.Player.alphaToUse});
                     requestAnimationFrame(App.Player.update);
                 }
@@ -1892,6 +1895,9 @@ var App={
                 document.getElementById('funFactsMobile').style.display = "none";
                 }
                 if(App.Player.clickCount==4){
+                //reset size of circle
+                document.getElementById('forceImg').style.width="30px";
+                document.getElementById('forceImg').style.height="30px";
                 document.getElementById('waitMobileWrapper').style.display = "none";
                 document.getElementById('orientationMobileWrapper').style.display = "none";
                 document.getElementById('azimuthMobileWrapper').style.display = "none";
