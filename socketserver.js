@@ -210,7 +210,7 @@ function hostPickCities(gameId){
         ['Kiev','50.30','30.28'],
         ['Belgrade','44.50','20.37'],
     ];*/
-    var targetCollection = 
+    /*var targetCollection = 
         [
             ['Berlin','52.493805', '13.455292'],
             ['London', '51.36', '-00.05'],
@@ -229,6 +229,12 @@ function hostPickCities(gameId){
             ['Ljubljana','46.04','14.33' ],
             ['Madrid','40.25','-03.45' ],
             ['Belgrade','44.50','20.37'],
+        ];*/
+    var targetCollection = 
+        [
+            ['Copenhagen','55.41','12.34'],
+            ['Copenhagen','55.41','12.34'],
+            ['Copenhagen','55.41','12.34'],
         ];
     var pickedCities=[];
     var randomPick=[];

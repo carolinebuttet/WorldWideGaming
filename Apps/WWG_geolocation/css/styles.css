@@ -28,6 +28,9 @@ body{
 .clickable {
      cursor: pointer;
 }
+#debug{
+  display:none;
+}
 /*NEW STYLESHEET FOR BROWSER---------------------------------------------------------------------*/
 .inline{
   display:inline-block;
