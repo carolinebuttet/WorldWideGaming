@@ -1683,11 +1683,8 @@ var App={
             showPosition:function (position) {
                 //App.Host.playerLat = position.coords.latitude;
                 //App.Host.playerLng=position.coords.longitude;
-                    App.Player.playerLat = 46;
-                    App.Player.playerLng = 6.5;
-                    App.Player.isPlayer1=false;
-                //App.Player.playerLat = position.coords.latitude;
-                //App.Player.playerLng = position.coords.longitude;
+                App.Player.playerLat = position.coords.latitude;
+                App.Player.playerLng = position.coords.longitude;
                 App.Player.playerCoordinates.push(App.Player.playerLat,App.Player.playerLng);
                 console.log(App.Player.playerCoordinates);
                 App.Player.isGeolocated=true;
