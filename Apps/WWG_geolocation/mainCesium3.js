@@ -1684,8 +1684,8 @@ var App={
                 //App.Host.playerLat = position.coords.latitude;
                 //App.Host.playerLng=position.coords.longitude;
                 if(App.Player.isPlayer1){
-                    App.Player.playerLat = 50.8;
-                    App.Player.playerLng = 4.35;
+                    App.Player.playerLat = 46;
+                    App.Player.playerLng = 6.5;
                     App.Player.isPlayer1=false;
                 }
                 else{
