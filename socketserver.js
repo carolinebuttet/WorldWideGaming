@@ -210,7 +210,7 @@ function hostPickCities(gameId){
         ['Kiev','50.30','30.28'],
         ['Belgrade','44.50','20.37'],
     ];*/
-    /*var targetCollection = 
+    var targetCollection = 
         [
             ['Berlin','52.493805', '13.455292'],
             ['London', '51.36', '-00.05'],
@@ -218,7 +218,6 @@ function hostPickCities(gameId){
             ['Budapest','47.29','19.05'],
             ['Vienna','48.12','16.22'],
             ['Prague','50.05','14.22'],
-            ['Copenhagen','55.41','12.34'],
             ['Dublin','53.21','-06.15'],
             ['Rome','41.54','12.29'],
             ['Vaduz','47.08','09.31'],
@@ -229,13 +228,13 @@ function hostPickCities(gameId){
             ['Ljubljana','46.04','14.33' ],
             ['Madrid','40.25','-03.45' ],
             ['Belgrade','44.50','20.37'],
-        ];*/
-    var targetCollection = 
+        ];
+    /*var targetCollection = 
         [
             ['Copenhagen','55.41','12.34'],
             ['Copenhagen','55.41','12.34'],
             ['Copenhagen','55.41','12.34'],
-        ];
+        ];*/
     var pickedCities=[];
     var randomPick=[];
     console.log('hostpickcities!!');
@@ -259,7 +258,7 @@ function hostPickCities(gameId){
     //send those cities to the game!
 }
 function onSendFunFact(data){
-        var funFactsCollection = [
+       var funFactsCollection = [
         ['Berlin',
             'Berlin is nine times bigger than Paris.', 
             'Berlin has around 1,700 bridges, easily beating Venice.', 
@@ -387,6 +386,7 @@ function onSendFunFact(data){
             'Serbian Orthodox Church Believers Jump in the Frozen Danube Every Winter'
         ],
     ];
+
     var cityNumber=0;
     var funFactRandomNumber=0;
 
